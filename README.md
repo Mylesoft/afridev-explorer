@@ -2,7 +2,7 @@
 
 > Discover African software developers and open-source repositories via GitHub.
 
-[![Test and Deploy](https://github.com/Mylesoft/afridev-explorer/workflows/Test%20and%20Deploy/badge.svg)](https://github.com/Mylesoft/afridev-explorer/actions)
+[![Deploy to GitHub Pages](https://github.com/Mylesoft/afridev-explorer/workflows/Deploy/badge.svg)](https://github.com/Mylesoft/afridev-explorer/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -10,32 +10,21 @@
 ## Table of Contents
 
 1. [Live Site](#live-site)
-2. [Screenshot](#screenshot)
-3. [Tech Stack](#tech-stack)
-4. [Features](#features)
-5. [Installation](#installation)
-6. [Local Development](#local-development)
-7. [Running Tests](#running-tests)
-8. [Project Structure](#project-structure)
-9. [GitHub API](#github-api)
-10. [Pages & Functionality](#pages--functionality)
-11. [Design System](#design-system)
-12. [Keyboard Shortcuts](#keyboard-shortcuts)
-13. [Contributing](#contributing)
-14. [Author](#author)
-15. [License](#license)
+2. [Tech Stack](#tech-stack)
+3. [Features](#features)
+4. [Project Structure](#project-structure)
+5. [GitHub API](#github-api)
+6. [Pages & Functionality](#pages--functionality)
+7. [Design System](#design-system)
+8. [Contributing](#contributing)
+9. [Author](#author)
+10. [License](#license)
 
 ---
 
 ## Live Site
 
 🚀 **https://Mylesoft.github.io/afridev-explorer/**
-
----
-
-## Screenshot
-
-![AfriDev Explorer screenshot](assets/og-image.png)
 
 ---
 
@@ -48,7 +37,6 @@
 | **Scripts** | Vanilla JavaScript | ES2022+ |
 | **Fonts** | Google Fonts | — |
 | **API** | GitHub REST API v3 | — |
-| **Testing** | Jest + jest-environment-jsdom | ^29 |
 | **CI/CD** | GitHub Actions | — |
 | **Hosting** | GitHub Pages | — |
 
@@ -62,141 +50,10 @@
 - **Live Activity Feed** - Watch African developers push code, open PRs, and star repos in real-time with 60-second auto-refresh
 - **Interactive Africa Map** - Visualize developer density across 54 African countries with clickable filtering
 - **Tech Leaderboard** - Top 8 programming languages used by African developers with animated bar chart
-- **Dark Mode** - Toggle between light and dark themes with system preference persistence
 - **Developer Bookmarks** - Save and export your favorite developers as JSON
 - **Search History** - Autocomplete suggestions from previous searches
-- **Keyboard Shortcuts** - Use `?` to view all available shortcuts
 - **Fully Responsive** - Works seamlessly on desktop, tablet, and mobile devices
 - **Accessible** - WCAG AA compliant with semantic HTML, ARIA labels, and keyboard navigation
-
----
-
-## Installation
-
-### Prerequisites
-
-- Node.js 18.x or higher
-- npm or yarn
-- Modern web browser
-- Git
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/Mylesoft/afridev-explorer.git
-cd afridev-explorer
-
-# Install dependencies
-npm install
-```
-
----
-
-## Local Development
-
-### Start a local server (required for ES6 modules)
-
-```bash
-# Using live-server
-npx live-server
-
-# Or using Python
-python3 -m http.server 8000
-
-# Or using Node.js http-server
-npx http-server -p 8000
-```
-
-Visit **http://localhost:8000** in your browser.
-
-### Optional: GitHub Personal Access Token
-
-For higher API rate limits (5,000 requests/hour instead of 60):
-
-1. Go to GitHub → Settings → Developer settings → Personal access tokens
-2. Create a fine-grained token with "Public Repositories (read-only)" permission
-3. Create `.env` file in project root:
-   ```
-   GITHUB_TOKEN=ghp_your_token_here
-   ```
-4. Paste the token into `js/api.js` temporarily during local development
-5. **Always remove before committing!**
-
----
-
-## Running Tests
-
-```bash
-# Run all tests once
-npm test
-
-# Watch mode for development
-npm run test:watch
-
-# Generate coverage report
-npm run test:coverage
-```
-
-**Coverage targets:**
-- `api.js` — minimum 10 tests
-- `render.js` — minimum 10 tests
-- `utils.js` — minimum 18 tests
-
----
-
-## Project Structure
-
-```
-afridev-explorer/
-│
-├── index.html                     # Home / Landing page
-├── developers.html                # 4-tab developer search page
-├── repositories.html              # Repository browser page
-├── profile.html                   # Individual developer profile (dynamic)
-├── activity.html                  # Live GitHub activity feed page
-├── about.html                     # About page
-├── 404.html                       # Custom 404 not-found page
-│
-├── assets/
-│   ├── default-avatar.png         # Fallback when GitHub avatar fails
-│   ├── favicon.svg                # SVG favicon (modern browsers)
-│   ├── favicon.png                # PNG favicon (fallback, 32x32)
-│   ├── og-image.png               # Open Graph social share image (1200x630px)
-│   └── africa-map.svg             # SVG map of Africa (54 country paths)
-│
-├── css/
-│   ├── reset.css                  # CSS reset — normalise browser defaults
-│   ├── variables.css              # Design tokens (colours, fonts, spacing, dark mode)
-│   ├── main.css                   # Global layout (navbar, hero, footer)
-│   ├── components.css             # Reusable UI components
-│   └── responsive.css             # Mobile-first media queries
-│
-├── js/
-│   ├── api.js                     # GitHub API fetch functions
-│   ├── render.js                  # DOM rendering — builds HTML from data
-│   ├── utils.js                   # Pure utility functions
-│   ├── theme.js                   # Dark mode with localStorage
-│   ├── navbar.js                  # Shared navbar logic
-│   ├── home.js                    # Home page logic
-│   ├── developers.js              # Developers page (4-tab state machine)
-│   ├── repositories.js            # Repositories page logic
-│   ├── profile.js                 # Profile page logic
-│   └── activity.js                # Live activity feed logic
-│
-├── tests/
-│   ├── api.test.js                # Unit tests for api.js
-│   ├── render.test.js             # Unit tests for render.js
-│   └── utils.test.js              # Unit tests for utils.js
-│
-├── .github/
-│   └── workflows/
-│       └── deploy.yml             # GitHub Actions CI/CD
-│
-├── .gitignore
-├── package.json                   # Project metadata and dependencies
-└── README.md                      # This file
-```
 
 ---
 
@@ -304,7 +161,6 @@ Features:
 | `--color-success` | `#16A34A` | Green — "Open to Work" badge |
 | `--color-danger` | `#DC2626` | Red — error states, destructive actions |
 
-**Dark mode:** Flips backgrounds and text while keeping primary/accent colours
 
 ### Typography
 
@@ -334,22 +190,6 @@ Features:
 
 ---
 
-## Keyboard Shortcuts
-
-Press `?` on any page to view all shortcuts:
-
-| Key | Action |
-|---|---|
-| `/` | Focus search input |
-| `d` | Go to Developers page |
-| `r` | Go to Repositories page |
-| `a` | Go to Activity page |
-| `b` | Go to Bookmarks |
-| `?` | Show shortcuts modal |
-| `Escape` | Close modals |
-
----
-
 ## Contributing
 
 Contributions are welcome! Here's how:
@@ -370,7 +210,6 @@ git checkout -b develop
 git checkout -b feat/feature-name
 
 # Make changes, test locally
-npm test
 
 # Commit and push
 git push origin feat/feature-name

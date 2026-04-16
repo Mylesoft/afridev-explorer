@@ -583,11 +583,6 @@
   box-shadow: var(--shadow-lg);
 }
 
-.feature-icon {
-  font-size: 3rem;
-  margin-bottom: var(--space-md);
-  display: block;
-}
 
 .feature-card h3 {
   margin-bottom: var(--space-md);

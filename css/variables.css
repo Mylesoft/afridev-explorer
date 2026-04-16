@@ -56,15 +56,3 @@
   --radius-xl:   16px;
   --radius-full: 9999px;
 }
-
-/* Dark Mode Overrides */
-[data-theme="dark"] {
-  --color-bg:           #0D1117;
-  --color-surface:      #161B22;
-  --color-text:         #C9D1D9;
-  --color-text-muted:   #8B949E;
-  --color-border:       #30363D;
-  /* Core colours (Navy, Gold, White) remain the same */
-  --color-primary:      #1A395B;   /* unchanged */
-  --color-accent:       #C79639;   /* unchanged */
-}

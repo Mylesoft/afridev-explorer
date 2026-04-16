@@ -237,10 +237,7 @@
     font-size: 0.95rem;
   }
 
-  .dark-toggle {
-    padding: var(--space-xs);
-  }
-
+  
   .hero {
     padding: var(--space-xl) 0;
   }

@@ -97,19 +97,6 @@ em { font-style: italic; }
 }
 
 
-.dark-toggle {
-  background: none;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  color: var(--color-text);
-  padding: var(--space-sm);
-  transition: border-color var(--transition-fast);
-}
-
-.dark-toggle:hover {
-  border-color: var(--color-accent);
-}
 
 .rate-limit-bar {
   position: absolute;

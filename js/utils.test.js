@@ -38,7 +38,9 @@ describe('utils.js', () => {
   });
 
   describe('debounce', () => {
-    jest.useFakeTimers();
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
 
     test('should delay function execution', () => {
       const fn = jest.fn();

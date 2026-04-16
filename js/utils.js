@@ -49,8 +49,8 @@ export function formatNumber(n) {
  */
 export function timeAgo(dateString) {
   const date = new Date(dateString);
-  const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
+  const now = Date.now();
+  const seconds = Math.floor((now - date.getTime()) / 1000);
 
   let interval = Math.floor(seconds / 31536000);
   if (interval >= 1) return interval === 1 ? '1 year ago' : interval + ' years ago';

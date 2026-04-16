@@ -132,14 +132,13 @@ export function getLanguageColor(lang) {
     Swift: '#fa7343',
     Kotlin: '#7f52ff',
   };
-  return colors[lang] || '#999999';
+  return colors[lang] || '#858585';
 }
 
 /**
  * Calculate max pages capped at GitHub's 1,000 result limit
  * @param {number} totalCount - Total results from API
- * @param {number} per Page
-   - Results per page
+ * @param {number} perPage - Results per page
  * @returns {number} - Maximum page number
  */
 export function getMaxPages(totalCount, perPage = 12) {

@@ -38,53 +38,30 @@ describe('utils.js', () => {
   });
 
   describe('debounce', () => {
-    beforeEach(() => {
-      // Setup global jest mock
-      global.jest = {
-        fn: () => {
-          const mockFn = (...args) => {
-            mockFn.calls.push(args);
-            mockFn.mockResults.push(mockFn.mockReturnValue);
-            return mockFn.mockReturnValue;
-          };
-          mockFn.calls = [];
-          mockFn.mockResults = [];
-          mockFn.mockReturnValue = undefined;
-          mockFn.mockImplementation = (impl) => {
-            mockFn.mockImpl = impl;
-            return mockFn;
-          };
-          mockFn.mockReturnValueOnce = (value) => {
-            mockFn.mockReturnValue = value;
-            return mockFn;
-          };
-          return mockFn;
-        }
-      };
-    });
+    jest.useFakeTimers();
 
-    test('should delay function execution', (done) => {
-      const fn = global.jest.fn();
+    test('should delay function execution', () => {
+      const fn = jest.fn();
       const debounced = debounce(fn, 100);
       debounced();
-      expect(fn.calls).toHaveLength(0);
-      setTimeout(() => {
-        expect(fn.calls).toHaveLength(1);
-        done();
-      }, 150);
+      expect(fn).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(100);
+      expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    test('should cancel previous calls on new call', (done) => {
-      const fn = global.jest.fn();
+    test('should cancel previous calls on new call', () => {
+      const fn = jest.fn();
       const debounced = debounce(fn, 50);
       debounced();
       debounced();
       debounced();
-      expect(fn.calls).toHaveLength(0);
-      setTimeout(() => {
-        expect(fn.calls).toHaveLength(1);
-        done();
-      }, 100);
+      expect(fn).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(50);
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
     });
   });
 

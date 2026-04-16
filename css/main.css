@@ -96,15 +96,6 @@ em { font-style: italic; }
   color: var(--color-accent);
 }
 
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: var(--color-accent);
-}
 
 .dark-toggle {
   background: none;

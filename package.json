@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Discover African developers and open-source projects via GitHub API",
   "author": "Jonathan Ayany",
+  "homepage": "https://[username].github.io/afridev-explorer",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
@@ -16,12 +17,10 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/tests/**/*.test.js"],
-    "testTimeout": 30000,
+    "testTimeout": 5000,
     "transform": {},
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "bail": 1,
-    "verbose": true
+    }
   }
 }

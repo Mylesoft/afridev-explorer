@@ -145,3 +145,120 @@ export function getMaxPages(totalCount, perPage = 12) {
   const cappedTotal = Math.min(totalCount, 1000);
   return Math.ceil(cappedTotal / perPage);
 }
+
+/**
+ * Detect keywords in bio to identify developer types
+ * @param {string} bio - GitHub bio text
+ * @returns {Object} - Keywords found (isOpenToWork, isCoFounder, isHiring)
+ */
+export function detectBioKeywords(bio = '') {
+  const lower = bio.toLowerCase();
+  return {
+    isOpenToWork: /open to work|available for hire|seeking opportunities|freelance|contractor/.test(lower),
+    isCoFounder:  /co-?founder|cofounder|looking to build|seeking co-?founder/.test(lower),
+    isHiring:     /hiring|we'?re hiring|join my team|open roles|join us/.test(lower),
+  };
+}
+
+/**
+ * Get bookmarked developers from localStorage
+ * @returns {Array} - Array of bookmarked usernames
+ */
+export function getBookmarks() {
+  return JSON.parse(localStorage.getItem('afridev_bookmarks') || '[]');
+}
+
+/**
+ * Toggle bookmark for a developer
+ * @param {string} username - GitHub username
+ * @returns {boolean} - True if bookmarked, false if removed
+ */
+export function toggleBookmark(username) {
+  const saved   = getBookmarks();
+  const updated = saved.includes(username)
+    ? saved.filter(u => u !== username)
+    : [...saved, username];
+  localStorage.setItem('afridev_bookmarks', JSON.stringify(updated));
+  return updated.includes(username);
+}
+
+/**
+ * Check if a developer is bookmarked
+ * @param {string} username - GitHub username
+ * @returns {boolean} - True if bookmarked
+ */
+export function isBookmarked(username) {
+  return getBookmarks().includes(username);
+}
+
+/**
+ * Export bookmarks as JSON file
+ * Downloads a JSON file with array of bookmarked usernames
+ */
+export function exportBookmarks() {
+  const bookmarks = getBookmarks();
+  const data = JSON.stringify(bookmarks, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'afridev-bookmarks.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Copy profile link to clipboard
+ * @param {string} username - GitHub username
+ */
+export async function copyProfileLink(username) {
+  const url = `${window.location.origin}/afridev-explorer/profile.html?user=${username}`;
+  await navigator.clipboard.writeText(url);
+}
+
+/**
+ * Get search history from localStorage
+ * @returns {Array} - Array of recent search terms
+ */
+export function getSearchHistory() {
+  return JSON.parse(localStorage.getItem('afridev_search_history') || '[]');
+}
+
+/**
+ * Add term to search history
+ * @param {string} term - Search term to add
+ */
+export function addToSearchHistory(term) {
+  if (!term.trim()) return;
+  const history = getSearchHistory().filter(h => h !== term);
+  history.unshift(term);
+  localStorage.setItem('afridev_search_history', JSON.stringify(history.slice(0, 10)));
+}
+
+/**
+ * Build date filter string for API query
+ * @param {string} from - Start date (YYYY-MM-DD)
+ * @param {string} to - End date (YYYY-MM-DD)
+ * @returns {string} - Formatted date filter for API
+ */
+export function buildDateFilter(from, to) {
+  if (!from) return '';
+  const end = to || new Date().toISOString().split('T')[0];
+  return `+created:${from}..${end}`;
+}
+
+/**
+ * Update rate limit bar display
+ * Shows remaining API calls with color coding
+ */
+export function updateRateLimitBar() {
+  const bar   = document.querySelector('.rate-limit-fill');
+  const label = document.querySelector('.rate-limit-label');
+  if (!bar) return;
+  const remaining = window.__rateLimitRemaining ?? 60;
+  const pct = (remaining / 60) * 100;
+  bar.style.width      = `${pct}%`;
+  bar.style.background = pct > 40 ? 'var(--color-success)'
+    : pct > 15 ? 'var(--color-accent)' : 'var(--color-danger)';
+  if (label) label.textContent = `${remaining}/60 API calls`;
+}

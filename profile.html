@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A395B" />
+  <meta name="description" content="View GitHub profile, repositories, and stats for African developers." />
+  <meta name="author" content="Jonathan Ayany" />
+  <meta name="keywords" content="developer profile, GitHub stats, open source, AfriDev" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AfriDev Explorer" />
+  <meta property="og:title" content="Developer Profile" />
+  <meta property="og:description" content="View GitHub profile, repositories, and stats." />
+  <meta property="og:image" content="https://github.com/[your-username]/afridev-explorer/raw/main/assets/og-image.png" />
+  <meta property="og:url" content="https://[your-username].github.io/afridev-explorer/profile.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Developer Profile" />
+  <meta name="twitter:description" content="View GitHub profile and repositories." />
+  <meta name="twitter:image" content="https://github.com/[your-username]/afridev-explorer/raw/main/assets/og-image.png" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.github.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <title>Developer Profile — AfriDev Explorer</title>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="site-header">
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AfriDev</span>
+            <span class="logo-accent">Explorer</span>
+          </a>
+        </div>
+        
+        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          |||
+        </button>
+        
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="developers.html" class="nav-link">Developers</a>
+          <a href="repositories.html" class="nav-link">Repositories</a>
+          <a href="activity.html" class="nav-link">Activity</a>
+          <a href="about.html" class="nav-link">About</a>
+          <button class="dark-toggle" aria-label="Toggle dark mode">?</button>
+        </div>
+        
+        <div class="rate-limit-bar">
+          <div class="rate-limit-fill"></div>
+          <span class="rate-limit-label">60/60 API calls</span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="back-section">
+      <div class="container">
+        <button class="btn-back" onclick="history.back()">← Back</button>
+      </div>
+    </section>
+
+    <section id="profile-header" class="profile-header"></section>
+
+    <section class="profile-repos">
+      <div class="container">
+        <div class="section-header"><h2>Top Repositories</h2></div>
+        <div id="profile-repos-grid" class="card-grid">
+          <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="not-found" class="empty-state" style="display: none;">
+      <h3>Developer not found</h3>
+      <p>The developer you're looking for doesn't exist or the URL is invalid.</p>
+      <a href="developers.html" class="btn btn--primary">Search Again</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">AfriDev<span class="logo-accent">.Explorer</span></a>
+          <p class="footer-tagline">Discover and connect with African developers</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Explore</h4>
+            <ul class="footer-nav">
+              <li><a href="developers.html">Developers</a></li>
+              <li><a href="repositories.html">Repositories</a></li>
+              <li><a href="activity.html">Activity</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>About</h4>
+            <ul class="footer-nav">
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="https://github.com/jonathan-ayany" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li><a href="mailto:contact@afridev.explorer">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">&copy; 2025 <a href="https://github.com/jonathan-ayany" target="_blank" rel="noopener noreferrer">Jonathan Ayany</a>. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <noscript><div style="padding: 2rem; text-align: center;"><p>Please enable JavaScript to view this profile.</p></div></noscript>
+
+  <script type="module" src="js/theme.js"></script>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A395B" />
+  <meta name="description" content="The page you are looking for does not exist." />
+  <meta name="author" content="Jonathan Ayany" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AfriDev Explorer" />
+  <meta property="og:title" content="404 — Not Found" />
+  <meta property="og:description" content="The page you are looking for does not exist." />
+  <meta property="og:image" content="https://github.com/[your-username]/afridev-explorer/raw/main/assets/og-image.png" />
+  <meta property="og:url" content="https://[your-username].github.io/afridev-explorer/" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <title>Page Not Found — AfriDev Explorer</title>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar">
+      <a href="index.html" class="navbar-logo">AfriDev</a>
+      <button class="navbar-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="developers.html" class="nav-link">Developers</a>
+        <a href="repositories.html" class="nav-link">Repositories</a>
+      </div>
+      <button class="dark-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="error-section" style="min-height: 60vh; display: flex; align-items: center;">
+      <div class="container" style="text-align: center;">
+        <h1 style="font-size: 6rem; color: var(--color-accent); margin: 0;">404</h1>
+        <h2>Page Not Found</h2>
+        <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">This page doesn't exist — yet. But there's plenty to explore!</p>
+        <div class="cta-buttons">
+          <a href="index.html" class="btn btn--primary">Go Home</a>
+          <a href="developers.html" class="btn btn--secondary">Browse Developers</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>AfriDev Explorer</h4><p>Shining a light on African tech talent.</p></div>
+        <div class="footer-section"><h4>Navigation</h4><ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="developers.html">Developers</a></li>
+          <li><a href="repositories.html">Repositories</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul></div>
+        <div class="footer-section"><h4>Connect</h4><ul>
+          <li><a href="https://github.com/[your-username]" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="mailto:ayany004@gmail.com">Email</a></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2025 AfriDev Explorer. Built by Jonathan Ayany.</p></div>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="js/theme.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
  */
 
 const BASE_URL = 'https://api.github.com';
-const GITHUB_TOKEN = ''; // Set via .env locally
+const GITHUB_TOKEN = window.AFRIDEV_GITHUB_TOKEN || '';
 
 const headers = GITHUB_TOKEN
   ? { Authorization: `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
@@ -167,8 +167,8 @@ export async function getUserRepos(username, sort = 'stars', perPage = 6) {
  * @param {number} perPage - Results per page
  * @returns {Promise<Object>} - Repository search results and rate limit info
  */
-export async function searchRepos(location = 'Africa', language = '', sort = 'stars', page = 1, perPage = 12) {
-  let query = `location:${location}`;
+export async function searchRepos(location = 'Africa', language = '', sort = 'stars', page = 1, perPage = 12, owner = '') {
+  let query = owner ? `user:${owner}` : `location:${location}`;
   if (language) query += `+language:${language}`;
 
   const url = `${BASE_URL}/search/repositories?q=${encodeURIComponent(query)}&sort=${sort}&per_page=${perPage}&page=${page}`;

@@ -2,16 +2,12 @@
  * PROFILE.JS - Profile Page Logic
  */
 
-import { getUser, getUserRepos } from './api.js';
-import { renderProfileHeader, renderRepoCard, renderErrorToast, renderDevCard } from './render.js';
-import { getQueryParam, isBookmarked, toggleBookmark, copyProfileLink } from './utils.js';
+import { getUser, getUserRepos, searchUsers } from './api.js';
+import { renderProfileHeader, renderRepoCard, renderErrorToast, renderDevCard, attachCardActionHandlers, showToast } from './render.js';
+import { getQueryParam, toggleBookmark, copyProfileLink } from './utils.js';
 
 const username = getQueryParam('user');
-const profileHeader = document.getElementById('profile-header');
-const profileReposGrid = document.getElementById('profile-repos-grid');
-const similarDevelopersGrid = document.getElementById('similar-developers-grid');
-const heatmapContainer = document.getElementById('contribution-heatmap');
-const notFound = document.getElementById('not-found');
+let profileHeader, profileReposGrid, similarDevelopersGrid, heatmapContainer, notFound;
 
 async function loadProfile() {
   if (!username) {
@@ -25,23 +21,35 @@ async function loadProfile() {
     
     // Load profile header with bookmark/share functionality
     profileHeader.innerHTML = renderProfileHeader(user);
+    notFound.style.display = 'none';
     
     // Load repositories
-    profileReposGrid.innerHTML = repos.map(r => renderRepoCard(r)).join('');
+    profileReposGrid.innerHTML = repos.length
+      ? repos.map(r => renderRepoCard(r)).join('')
+      : '<p>No public repositories available yet.</p>';
     
     // Load contribution heatmap
     await loadContributionHeatmap(username);
     
     // Load similar developers
     await loadSimilarDevelopers(username, user.location);
+
+    attachCardActionHandlers(profileReposGrid);
+    attachCardActionHandlers(similarDevelopersGrid);
   } catch (error) {
+    console.error('Error loading profile:', error);
     notFound.style.display = 'block';
-    renderErrorToast('Developer not found');
+    renderErrorToast(error.message || 'Developer not found');
   }
 }
 
 // Load contribution heatmap
 async function loadContributionHeatmap(username) {
+  if (!heatmapContainer) {
+    console.error('Heatmap container not found');
+    return;
+  }
+  
   heatmapContainer.innerHTML = '<div class="heatmap-loading">Loading contribution data...</div>';
   
   try {
@@ -110,54 +118,34 @@ async function loadSimilarDevelopers(username, location) {
   similarDevelopersGrid.innerHTML = '<div class="skeleton skeleton-card"></div>'.repeat(6);
   
   try {
-    // Mock similar developers (in real implementation, this would use GitHub API)
-    const similarDevelopers = [
-      {
-        login: 'kelvinkamau',
-        name: 'Kelvin Kamau',
-        avatar_url: 'https://avatars.githubusercontent.com/u/1182366?v=4',
-        followers: 1250,
-        public_repos: 45
-      },
-      {
-        login: 'njerimuriuki',
-        name: 'Njeri Muriuki',
-        avatar_url: 'https://avatars.githubusercontent.com/u/1234567?v=4',
-        followers: 890,
-        public_repos: 32
-      },
-      {
-        login: 'mikekagiri',
-        name: 'Mike Kagiri',
-        avatar_url: 'https://avatars.githubusercontent.com/u/2345678?v=4',
-        followers: 567,
-        public_repos: 28
-      },
-      {
-        login: 'wanjohikibui',
-        name: 'Wanjohi Kibui',
-        avatar_url: 'https://avatars.githubusercontent.com/u/3456789?v=4',
-        followers: 445,
-        public_repos: 19
-      },
-      {
-        login: 'daviesk',
-        name: 'Davies K',
-        avatar_url: 'https://avatars.githubusercontent.com/u/4567890?v=4',
-        followers: 334,
-        public_repos: 15
-      },
-      {
-        login: 'calebokoli',
-        name: 'Caleb Okoli',
-        avatar_url: 'https://avatars.githubusercontent.com/u/5678901?v=4',
-        followers: 223,
-        public_repos: 11
-      }
-    ];
-    
-    similarDevelopersGrid.innerHTML = similarDevelopers.map(dev => renderDevCard(dev)).join('');
+    const candidateUsers = [];
+
+    if (location) {
+      const locationResult = await searchUsers(location, 1, 12, 'location');
+      candidateUsers.push(...(locationResult.users || []));
+    }
+
+    if (candidateUsers.length < 6) {
+      const usernameResult = await searchUsers(username, 1, 12, 'username');
+      candidateUsers.push(...(usernameResult.users || []));
+    }
+
+    const uniqueUsers = Array.from(
+      new Map(
+        candidateUsers
+          .filter((user) => user?.login && user.login.toLowerCase() !== username.toLowerCase())
+          .map((user) => [user.login.toLowerCase(), user])
+      ).values()
+    ).slice(0, 6);
+
+    if (uniqueUsers.length === 0) {
+      similarDevelopersGrid.innerHTML = '<p>No similar developers available right now.</p>';
+      return;
+    }
+
+    similarDevelopersGrid.innerHTML = uniqueUsers.map(dev => renderDevCard(dev)).join('');
   } catch (error) {
+    console.error('Error loading similar developers:', error);
     similarDevelopersGrid.innerHTML = '<p>Failed to load similar developers.</p>';
   }
 }
@@ -180,6 +168,10 @@ function setupProfileActions() {
           bookmarkBtn.classList.toggle('bookmarked', isNowBookmarked);
           bookmarkBtn.textContent = isNowBookmarked ? 'star' : 'star_border';
           bookmarkBtn.setAttribute('aria-label', isNowBookmarked ? 'Remove bookmark' : 'Add bookmark');
+          showToast(
+            isNowBookmarked ? 'Profile saved to bookmarks.' : 'Profile removed from bookmarks.',
+            'success'
+          );
         }
       }
       
@@ -189,10 +181,9 @@ function setupProfileActions() {
         const username = shareBtn.dataset.username;
         if (username) {
           copyProfileLink(username).then(() => {
-            // Show success message (in real implementation, this would use toast)
-            alert('Profile link copied to clipboard!');
+            showToast('Profile link copied to clipboard!', 'success');
           }).catch(() => {
-            alert('Failed to copy profile link');
+            showToast('Failed to copy profile link.', 'error');
           });
         }
       }
@@ -200,13 +191,15 @@ function setupProfileActions() {
   }
 }
 
-document.querySelector('.navbar-toggle')?.addEventListener('click', function() {
-  document.querySelector('.nav-links').classList.toggle('open');
-  this.setAttribute('aria-expanded', document.querySelector('.nav-links').classList.contains('open'));
-});
-
 // Initialize profile page
 document.addEventListener('DOMContentLoaded', () => {
+  // Get DOM elements
+  profileHeader = document.getElementById('profile-header');
+  profileReposGrid = document.getElementById('profile-repos-grid');
+  similarDevelopersGrid = document.getElementById('similar-developers-grid');
+  heatmapContainer = document.getElementById('contribution-heatmap');
+  notFound = document.getElementById('not-found');
+  
   loadProfile();
   setupProfileActions();
 });

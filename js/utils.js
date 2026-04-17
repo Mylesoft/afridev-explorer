@@ -212,7 +212,8 @@ export function exportBookmarks() {
  * @param {string} username - GitHub username
  */
 export async function copyProfileLink(username) {
-  const url = `${window.location.origin}/afridev-explorer/profile.html?user=${username}`;
+  const baseUrl = `${window.location.origin || 'http://localhost'}${window.location.pathname || '/'}`;
+  const url = new URL(`./profile.html?user=${encodeURIComponent(username)}`, baseUrl).toString();
   await navigator.clipboard.writeText(url);
 }
 

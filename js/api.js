@@ -4,7 +4,7 @@
  */
 
 const BASE_URL = 'https://api.github.com';
-const GITHUB_TOKEN = ''; // Set via .env locally
+const GITHUB_TOKEN = window.AFRIDEV_GITHUB_TOKEN || '';
 
 const headers = GITHUB_TOKEN
   ? { Authorization: `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }

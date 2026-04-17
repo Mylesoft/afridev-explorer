@@ -1,14 +1,25 @@
 // Jest setup file
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  store: {},
+  getItem: jest.fn((key) => localStorageMock.store[key] ?? null),
+  setItem: jest.fn((key, value) => {
+    localStorageMock.store[key] = String(value);
+  }),
+  removeItem: jest.fn((key) => {
+    delete localStorageMock.store[key];
+  }),
+  clear: jest.fn(() => {
+    localStorageMock.store = {};
+  }),
 };
 global.localStorage = localStorageMock;
+global.localStorageMock = localStorageMock;
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Mock fetch API
 global.fetch = jest.fn();

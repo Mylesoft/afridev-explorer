@@ -109,11 +109,17 @@ async function loadDevelopers() {
     resultCount.textContent = `${result.totalCount} developers found`;
     
     const maxPages = getMaxPages(result.totalCount, 12);
+    window.__afridevOnPageChange = (page) => {
+      currentPage = page;
+      loadDevelopers();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
     pagination.innerHTML = renderPagination(currentPage, maxPages, (page) => {
       currentPage = page;
       loadDevelopers();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    attachCardActionHandlers(pagination);
   } catch (error) {
     console.error('Error loading developers:', error);
     grid.innerHTML = '<p>Error loading developers. Please try again.</p>';
@@ -304,12 +310,6 @@ jobsSortSelect?.addEventListener('change', () => {
   loadDevelopers();
 });
 
-// Hamburger menu
-document.querySelector('.navbar-toggle')?.addEventListener('click', function() {
-  document.querySelector('.nav-links').classList.toggle('open');
-  this.setAttribute('aria-expanded', document.querySelector('.nav-links').classList.contains('open'));
-});
-
 // Event delegation for card clicks on developers page
 function setupDeveloperCardClickHandlers() {
   const container = document.getElementById('developers-grid');
@@ -350,7 +350,7 @@ function setupDeveloperCardClickHandlers() {
 }
 
 // Initial load
-const searchParam = getQueryParam('search');
+const searchParam = getQueryParam('q') || getQueryParam('search');
 const countryParam = getQueryParam('country');
 
 if (searchParam) {

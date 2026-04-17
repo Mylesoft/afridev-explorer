@@ -511,6 +511,8 @@
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--transition-base);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .card::after {
@@ -523,6 +525,8 @@
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.02) 0%, rgba(26, 57, 91, 0.02) 100%);
   opacity: 0;
   transition: opacity var(--transition-base);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .card:hover {
@@ -546,6 +550,8 @@
   margin-bottom: var(--space-lg);
   padding-bottom: var(--space-md);
   border-bottom: 1px solid var(--color-border-light);
+  position: relative;
+  z-index: 1;
 }
 
 .card-avatar {
@@ -583,6 +589,8 @@
 .card-content {
   flex: 1;
   margin-bottom: var(--space-lg);
+  position: relative;
+  z-index: 1;
 }
 
 .card-description {
@@ -655,19 +663,25 @@
 .card-footer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   padding-top: var(--space-md);
   border-top: 1px solid var(--color-border-light);
   margin-top: auto;
-  flex-wrap: nowrap;
+  gap: var(--space-md);
+  flex-wrap: wrap;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .card-actions {
   display: flex;
   gap: var(--space-xs);
   align-items: center;
-  flex-shrink: 0;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  flex: 1 1 220px;
+  min-width: 0;
 }
 
 .card-meta {
@@ -678,7 +692,8 @@
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   margin-bottom: 0;
-  flex-shrink: 0;
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .card-link {
@@ -695,11 +710,18 @@
   border: 1px solid transparent;
   background: rgba(199, 150, 57, 0.08);
   line-height: 1.3;
+  justify-content: center;
+  min-height: 32px;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .card-link:hover {
   color: var(--color-primary);
-  transform: translateX(2px);
+  transform: translateY(-1px);
+  border-color: var(--color-accent-light);
+  background: rgba(199, 150, 57, 0.16);
 }
 
 .dev-card,
@@ -708,6 +730,11 @@
   flex-direction: column;
   min-height: 320px;
   height: 100%;
+}
+
+.dev-card .card-actions,
+.repo-card .card-actions {
+  row-gap: var(--space-xs);
 }
 
 .dev-card:hover,

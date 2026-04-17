@@ -1,0 +1,1440 @@
+html
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AfriDev Explorer — Discover African Developers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#1A395B;--navy-dark:#0F2238;--navy-light:#2A5080;--navy-muted:rgba(26,57,91,.08);
+  --gold:#C79639;--gold-dark:#A07820;--gold-light:#E0B860;--gold-muted:rgba(199,150,57,.15);
+  --white:#FFFFFF;--bg:#F5F7FA;--bg-alt:#EEF1F6;--surface:#FFFFFF;
+  --text:#1A1A2E;--text-muted:#5A6478;--border:#D8DEE8;
+  --success:#16A34A;--danger:#DC2626;
+  --font-head:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-xl:24px;--r-full:9999px;
+  --sh-sm:0 1px 4px rgba(26,57,91,.08);
+  --sh-md:0 4px 20px rgba(26,57,91,.12);
+  --sh-lg:0 8px 40px rgba(26,57,91,.18);
+  --sh-gold:0 4px 24px rgba(199,150,57,.3);
+  --nav-h:68px;
+}
+[data-theme="dark"]{
+  --bg:#0D1117;--bg-alt:#161B22;--surface:#161B22;
+  --text:#C9D1D9;--text-muted:#8B949E;--border:#30363D;
+  --navy-muted:rgba(199,150,57,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+ul,ol{list-style:none}
+button{cursor:pointer;font:inherit;border:none;background:none}
+input,select,textarea{font:inherit}
+
+/* ─── LAYOUT ─── */
+.container{width:100%;max-width:1200px;margin:0 auto;padding:0 2rem}
+.page{display:none}
+.page.active{display:block}
+.section{padding:5rem 0}
+.section-sm{padding:3rem 0}
+
+/* ─── NAV ─── */
+.site-header{position:sticky;top:0;z-index:200;background:var(--navy);height:var(--nav-h);border-bottom:2px solid var(--gold)}
+.navbar{display:flex;align-items:center;justify-content:space-between;height:100%;max-width:1200px;margin:0 auto;padding:0 2rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-head);font-size:1.3rem;color:var(--white);cursor:pointer}
+.logo-globe{font-size:1.4rem}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:.25rem}
+.nav-link{font-size:.875rem;font-weight:500;color:rgba(255,255,255,.75);padding:.5rem 1rem;border-radius:var(--r-md);transition:all .2s;cursor:pointer;background:none;border:none}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-link.active{color:var(--gold);background:rgba(199,150,57,.15)}
+.nav-actions{display:flex;align-items:center;gap:.75rem}
+.nav-rate{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:rgba(255,255,255,.6);font-family:var(--font-mono)}
+.rate-bar-wrap{width:60px;height:4px;background:rgba(255,255,255,.2);border-radius:var(--r-full);overflow:hidden}
+.rate-bar-fill{height:100%;background:var(--success);width:75%;border-radius:var(--r-full);transition:width .5s}
+.btn-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-md);color:rgba(255,255,255,.75);transition:all .2s;font-size:1rem}
+.btn-icon:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;border-radius:var(--r-md);font-size:.9rem;font-weight:600;transition:all .2s;cursor:pointer;border:none}
+.btn-primary{background:var(--gold);color:var(--navy-dark)}
+.btn-primary:hover{background:var(--gold-dark);transform:translateY(-1px);box-shadow:var(--sh-gold)}
+.btn-secondary{background:var(--navy);color:var(--white)}
+.btn-secondary:hover{background:var(--navy-dark);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:2px solid var(--gold);color:var(--gold)}
+.btn-outline:hover{background:var(--gold);color:var(--navy-dark)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-muted)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm{padding:.4rem 1rem;font-size:.8rem}
+.btn-xs{padding:.25rem .7rem;font-size:.75rem}
+
+/* ─── HERO ─── */
+.hero{background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,var(--navy-light) 100%);min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-bg-pattern{position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(0deg,var(--white) 0,var(--white) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,var(--white) 0,var(--white) 1px,transparent 1px,transparent 40px)}
+.hero-content{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;padding:4rem 0}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(199,150,57,.15);border:1px solid rgba(199,150,57,.3);color:var(--gold);font-size:.8rem;font-weight:600;padding:.35rem .9rem;border-radius:var(--r-full);margin-bottom:1.25rem;letter-spacing:.05em;text-transform:uppercase}
+.hero-title{font-family:var(--font-head);font-size:clamp(2.5rem,5vw,4rem);color:var(--white);line-height:1.1;margin-bottom:1.25rem}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.7);max-width:480px;margin-bottom:2rem;line-height:1.75}
+.hero-search-wrap{display:flex;gap:.5rem;margin-bottom:1.5rem;max-width:520px}
+.hero-search-input{flex:1;padding:.8rem 1.25rem;border-radius:var(--r-md);border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:var(--white);font-size:.95rem;transition:all .25s}
+.hero-search-input::placeholder{color:rgba(255,255,255,.4)}
+.hero-search-input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.12)}
+.country-pills{display:flex;flex-wrap:wrap;gap:.5rem}
+.cpill{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;font-weight:500;padding:.35rem .9rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-full);color:rgba(255,255,255,.8);cursor:pointer;transition:all .2s}
+.cpill:hover,.cpill.active{background:var(--gold-muted);border-color:var(--gold);color:var(--gold)}
+
+/* Hero Visual */
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative}
+.globe-wrap{position:relative;width:320px;height:320px;display:flex;align-items:center;justify-content:center}
+.globe-emoji{font-size:5.5rem;animation:float 4s ease-in-out infinite;position:relative;z-index:2;filter:drop-shadow(0 20px 40px rgba(0,0,0,.4))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.orbit{position:absolute;border:1px dashed rgba(255,255,255,.15);border-radius:50%}
+.orbit-1{width:160px;height:160px;animation:spin 8s linear infinite}
+.orbit-2{width:230px;height:230px;animation:spin 14s linear infinite reverse}
+.orbit-3{width:310px;height:310px;animation:spin 20s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.hero-stats{display:flex;gap:2.5rem;margin-top:2.5rem}
+.hstat{text-align:center}
+.hstat-num{font-family:var(--font-mono);font-size:1.5rem;font-weight:600;color:var(--gold);display:block}
+.hstat-lbl{font-size:.75rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em}
+
+/* ─── STATS STRIP ─── */
+.stats-strip{background:var(--navy);padding:2rem 0;border-top:1px solid rgba(199,150,57,.2);border-bottom:1px solid rgba(199,150,57,.2)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center}
+.stat-item{padding:1.25rem}
+.stat-num{font-family:var(--font-mono);font-size:2rem;font-weight:600;color:var(--gold);display:block}
+.stat-lbl{font-size:.8rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.25rem}
+
+/* ─── SECTION HEADERS ─── */
+.sh{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem}
+.sh-left .label{font-size:.75rem;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem}
+.sh-left h2{font-family:var(--font-head);font-size:2rem;color:var(--navy)}
+[data-theme="dark"] .sh-left h2{color:var(--white)}
+
+/* ─── CARDS GRID ─── */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+.cards-grid-3{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+
+/* ─── DEV CARD ─── */
+.dev-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.dev-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.dev-card:hover{transform:translateY(-4px);box-shadow:var(--sh-md);border-color:var(--gold)}
+.dev-card:hover::after{transform:scaleX(1)}
+.dev-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
+.dev-avatar{width:52px;height:52px;border-radius:var(--r-full);object-fit:cover;border:2px solid var(--border);background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.dev-card-actions{display:flex;gap:.4rem}
+.star-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-muted);transition:all .2s;font-size:.9rem}
+.star-btn:hover,.star-btn.saved{color:var(--gold)}
+.dev-name{font-family:var(--font-head);font-size:1.05rem;color:var(--navy);font-weight:700;margin-bottom:.15rem}
+[data-theme="dark"] .dev-name{color:var(--white)}
+.dev-username{font-size:.8rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:.4rem}
+.dev-loc{font-size:.8rem;color:var(--text-muted);margin-bottom:.75rem}
+.badges{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem}
+.badge{font-size:.7rem;font-weight:600;padding:.2rem .6rem;border-radius:var(--r-full);display:inline-flex;align-items:center;gap:.25rem}
+.badge-open{background:rgba(22,163,74,.12);color:#16A34A;border:1px solid rgba(22,163,74,.25)}
+.badge-cofounder{background:var(--navy-muted);color:var(--navy);border:1px solid rgba(26,57,91,.2)}
+[data-theme="dark"] .badge-cofounder{color:var(--gold);border-color:rgba(199,150,57,.3)}
+.badge-hiring{background:var(--gold-muted);color:var(--gold-dark);border:1px solid rgba(199,150,57,.3)}
+.badge-lang{background:var(--bg-alt);color:var(--text-muted);border:1px solid var(--border)}
+.dev-card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:.85rem;margin-top:.85rem}
+.dev-stats{display:flex;gap:1.25rem}
+.ds{font-size:.8rem;color:var(--text-muted)}
+.ds strong{font-family:var(--font-mono);color:var(--navy);font-weight:600}
+[data-theme="dark"] .ds strong{color:var(--white)}
+
+/* ─── REPO CARD ─── */
+.repo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;transition:all .25s}
+.repo-card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--border)}
+.repo-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.repo-avatar{width:36px;height:36px;border-radius:var(--r-sm);background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.repo-full-name{font-family:var(--font-mono);font-size:.85rem;color:var(--navy);font-weight:600}
+[data-theme="dark"] .repo-full-name{color:var(--gold)}
+.lang-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.35rem}
+.lang-badge-inline{display:inline-flex;align-items:center;font-size:.75rem;color:var(--text-muted);font-weight:500}
+.repo-desc{font-size:.875rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.repo-footer{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:.8rem;color:var(--text-muted)}
+.repo-stat{display:flex;align-items:center;gap:.3rem}
+
+/* ─── ACTIVITY FEED ─── */
+.activity-card{display:flex;align-items:flex-start;gap:.85rem;padding:.875rem 0;border-bottom:1px solid var(--border)}
+.activity-card:last-child{border-bottom:none}
+.activity-icon{width:32px;height:32px;border-radius:var(--r-sm);background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.activity-avatar{width:28px;height:28px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;border:1px solid var(--border)}
+.activity-body{flex:1;min-width:0}
+.activity-text{font-size:.875rem;color:var(--text);line-height:1.45}
+.activity-text a{color:var(--navy);font-weight:600}
+[data-theme="dark"] .activity-text a{color:var(--gold)}
+.activity-time{font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono);margin-top:.2rem}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* ─── AFRICA MAP ─── */
+.africa-section{background:var(--navy);padding:5rem 0;overflow:hidden}
+.africa-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.africa-map-wrap{position:relative}
+.africa-map-svg{width:100%;max-width:380px;margin:0 auto}
+.map-country{fill:#2A5080;stroke:rgba(255,255,255,.15);stroke-width:.5;cursor:pointer;transition:fill .25s}
+.map-country:hover,.map-country.active{fill:var(--gold)}
+.map-country.d-high{fill:#16A34A}
+.map-country.d-med{fill:#2A5080}
+.map-country.d-low{fill:#1A395B}
+.map-legend{display:flex;gap:1.5rem;margin-top:1.25rem;justify-content:center}
+.ml-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:rgba(255,255,255,.6)}
+.ml-dot{width:10px;height:10px;border-radius:2px}
+.africa-info h2{font-family:var(--font-head);font-size:2.25rem;color:var(--white);margin-bottom:1rem}
+.africa-info p{color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:1.5rem}
+.country-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.5rem}
+.cstat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-md);padding:.85rem 1rem}
+.cstat-num{font-family:var(--font-mono);font-size:1.1rem;font-weight:600;color:var(--gold)}
+.cstat-lbl{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem}
+
+/* ─── TECH LEADERBOARD ─── */
+.leaderboard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem}
+.lb-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem}
+.lb-rank{font-family:var(--font-mono);font-size:.8rem;color:var(--text-muted);width:20px;text-align:right}
+.lb-lang{font-size:.875rem;font-weight:600;color:var(--text);width:90px;flex-shrink:0}
+.lb-bar-wrap{flex:1;height:20px;background:var(--bg-alt);border-radius:var(--r-full);overflow:hidden}
+.lb-bar{height:100%;border-radius:var(--r-full);transition:width .8s cubic-bezier(.25,.46,.45,.94);display:flex;align-items:center;padding-left:.6rem}
+.lb-bar span{font-family:var(--font-mono);font-size:.7rem;font-weight:600;color:var(--white);white-space:nowrap}
+.lb-count{font-family:var(--font-mono);font-size:.8rem;color:var(--text-muted);width:50px;text-align:right}
+
+/* ─── TABS ─── */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:2rem;overflow-x:auto}
+.tab-btn{padding:.75rem 1.5rem;font-size:.9rem;font-weight:600;color:var(--text-muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--navy)}
+[data-theme="dark"] .tab-btn:hover{color:var(--gold)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ─── FILTER BAR ─── */
+.filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;padding:1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:1.5rem}
+.filter-select{padding:.5rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:.875rem;cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--gold)}
+.filter-input{padding:.5rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:.875rem;flex:1;min-width:160px}
+.filter-input:focus{outline:none;border-color:var(--gold)}
+.tech-pills-wrap{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.tech-pills-group label{font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;display:block}
+.tech-pills{display:flex;flex-wrap:wrap;gap:.4rem}
+.tech-pill{padding:.35rem .85rem;font-size:.8rem;font-weight:500;border-radius:var(--r-full);border:1.5px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .2s;background:var(--surface)}
+.tech-pill:hover{border-color:var(--gold);color:var(--gold)}
+.tech-pill.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+
+/* ─── PAGE HEADER ─── */
+.page-header{background:var(--navy);padding:3.5rem 0 3rem;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--navy-dark),var(--navy));opacity:.7}
+.page-header-content{position:relative;z-index:1}
+.ph-label{font-size:.75rem;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.ph-title{font-family:var(--font-head);font-size:2.5rem;color:var(--white);margin-bottom:.75rem}
+.ph-sub{color:rgba(255,255,255,.65);font-size:1rem;max-width:500px}
+.ph-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(199,150,57,.15);border:1px solid rgba(199,150,57,.3);color:var(--gold);font-family:var(--font-mono);font-size:.8rem;padding:.3rem .8rem;border-radius:var(--r-full);margin-top:.75rem}
+
+/* ─── PROFILE PAGE ─── */
+.profile-hero{background:var(--navy);padding:3.5rem 0;position:relative;overflow:hidden}
+.profile-hero-inner{display:flex;align-items:center;gap:2.5rem}
+.profile-avatar-lg{width:110px;height:110px;border-radius:50%;border:4px solid var(--gold);flex-shrink:0;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.profile-meta h1{font-family:var(--font-head);font-size:2rem;color:var(--white);margin-bottom:.25rem}
+.profile-username{font-family:var(--font-mono);font-size:.95rem;color:var(--gold);margin-bottom:.5rem}
+.profile-location{font-size:.875rem;color:rgba(255,255,255,.6);margin-bottom:.75rem}
+.profile-bio{font-size:.95rem;color:rgba(255,255,255,.75);max-width:480px;line-height:1.65;margin-bottom:1rem}
+.profile-stats-row{display:flex;gap:2rem;margin-top:1rem}
+.pstat{text-align:center}
+.pstat-num{font-family:var(--font-mono);font-size:1.25rem;font-weight:600;color:var(--gold);display:block}
+.pstat-lbl{font-size:.75rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em}
+.profile-actions{display:flex;gap:.75rem;margin-top:1.25rem}
+.heatmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem}
+.heatmap-wrap h3{font-family:var(--font-head);font-size:1rem;color:var(--navy);margin-bottom:1rem}
+[data-theme="dark"] .heatmap-wrap h3{color:var(--white)}
+.heatmap-grid{display:grid;grid-template-columns:repeat(52,1fr);gap:2px}
+.hmap-cell{aspect-ratio:1;border-radius:2px;background:var(--bg-alt)}
+.hmap-cell.l1{background:#d1fae5}.hmap-cell.l2{background:#6ee7b7}.hmap-cell.l3{background:#16A34A}.hmap-cell.l4{background:#047857}
+
+/* ─── JOB CARD ─── */
+.job-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;transition:all .25s;display:flex;gap:1.25rem}
+.job-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--border)}
+.job-logo{width:52px;height:52px;border-radius:var(--r-md);background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:1px solid var(--border)}
+.job-body{flex:1;min-width:0}
+.job-title{font-family:var(--font-head);font-size:1.1rem;color:var(--navy);font-weight:700;margin-bottom:.25rem}
+[data-theme="dark"] .job-title{color:var(--white)}
+.job-company{font-size:.875rem;font-weight:600;color:var(--gold);margin-bottom:.5rem}
+.job-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
+.job-tag{font-size:.75rem;padding:.2rem .65rem;border-radius:var(--r-full);background:var(--bg-alt);color:var(--text-muted);border:1px solid var(--border)}
+.job-footer{display:flex;align-items:center;justify-content:space-between}
+.job-meta{display:flex;gap:1rem;font-size:.8rem;color:var(--text-muted)}
+.job-salary{font-family:var(--font-mono);font-size:.85rem;font-weight:600;color:var(--success)}
+
+/* ─── COMMUNITY FEED ─── */
+.post-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem}
+.post-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem}
+.post-avatar{width:40px;height:40px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.post-author-name{font-weight:600;font-size:.9rem;color:var(--text)}
+.post-author-role{font-size:.75rem;color:var(--text-muted)}
+.post-time{font-family:var(--font-mono);font-size:.75rem;color:var(--text-muted);margin-left:auto}
+.post-type-badge{font-size:.7rem;font-weight:600;padding:.15rem .55rem;border-radius:var(--r-full)}
+.ptb-win{background:rgba(22,163,74,.12);color:#16A34A}
+.ptb-question{background:rgba(26,57,91,.1);color:var(--navy)}
+.ptb-build{background:var(--gold-muted);color:var(--gold-dark)}
+.ptb-general{background:var(--bg-alt);color:var(--text-muted)}
+.post-content{font-size:.95rem;color:var(--text);line-height:1.65;margin-bottom:1rem}
+.post-hashtag{color:var(--gold);font-weight:600;cursor:pointer}
+.post-actions{display:flex;gap:1.25rem;border-top:1px solid var(--border);padding-top:.85rem}
+.post-action-btn{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text-muted);cursor:pointer;transition:color .2s;background:none;border:none;padding:.25rem}
+.post-action-btn:hover{color:var(--navy)}
+[data-theme="dark"] .post-action-btn:hover{color:var(--gold)}
+.post-action-btn.liked{color:var(--danger)}
+
+/* ─── NEW POST BOX ─── */
+.new-post-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1.5rem}
+.new-post-top{display:flex;gap:.85rem;align-items:flex-start;margin-bottom:.85rem}
+.new-post-avatar{width:40px;height:40px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:700;flex-shrink:0}
+.new-post-textarea{flex:1;border:1.5px solid var(--border);border-radius:var(--r-md);padding:.75rem;resize:none;font-family:var(--font-body);font-size:.9rem;color:var(--text);background:var(--bg-alt);min-height:80px}
+.new-post-textarea:focus{outline:none;border-color:var(--gold)}
+.new-post-footer{display:flex;align-items:center;justify-content:space-between}
+.post-type-select{padding:.4rem .85rem;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:.8rem;color:var(--text);background:var(--surface)}
+.char-count{font-family:var(--font-mono);font-size:.75rem;color:var(--text-muted)}
+
+/* ─── COFOUNDER CARD ─── */
+.cf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;transition:all .25s}
+.cf-card:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+.cf-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
+.cf-stage{font-size:.75rem;font-weight:700;padding:.3rem .75rem;border-radius:var(--r-full);text-transform:uppercase;letter-spacing:.05em}
+.stage-idea{background:rgba(26,57,91,.1);color:var(--navy)}
+.stage-prototype{background:var(--gold-muted);color:var(--gold-dark)}
+.stage-mvp{background:rgba(22,163,74,.12);color:#16A34A}
+.stage-revenue{background:rgba(199,150,57,.2);color:var(--gold-dark)}
+.cf-title{font-family:var(--font-head);font-size:1.1rem;color:var(--navy);margin-bottom:.5rem}
+[data-theme="dark"] .cf-title{color:var(--white)}
+.cf-desc{font-size:.875rem;color:var(--text-muted);line-height:1.55;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cf-skills{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem}
+.cf-skill{font-size:.75rem;padding:.2rem .65rem;border-radius:var(--r-full);background:var(--navy-muted);color:var(--navy);border:1px solid rgba(26,57,91,.15)}
+[data-theme="dark"] .cf-skill{background:rgba(199,150,57,.1);color:var(--gold);border-color:rgba(199,150,57,.2)}
+.cf-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:.85rem;margin-top:.85rem}
+.cf-author{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-muted)}
+.cf-author-av{width:24px;height:24px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--white)}
+
+/* ─── CTA BANNER ─── */
+.cta-banner{background:var(--navy);border-top:3px solid var(--gold);border-bottom:3px solid var(--gold);padding:4rem 0;text-align:center}
+.cta-banner h2{font-family:var(--font-head);font-size:2.25rem;color:var(--white);margin-bottom:1rem}
+.cta-banner p{color:rgba(255,255,255,.65);margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+/* ─── FOOTER ─── */
+.site-footer{background:var(--navy-dark);padding:3rem 0 2rem;border-top:1px solid rgba(199,150,57,.2)}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand .logo{margin-bottom:1rem}
+.footer-brand p{font-size:.85rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:260px}
+.footer-col h4{font-size:.8rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+.footer-link{display:block;font-size:.875rem;color:rgba(255,255,255,.55);margin-bottom:.5rem;cursor:pointer;transition:color .2s}
+.footer-link:hover{color:var(--gold)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:.8rem;color:rgba(255,255,255,.35)}
+.footer-author{font-size:.8rem;color:rgba(255,255,255,.35)}
+.footer-author span{color:var(--gold)}
+
+/* ─── PAGINATION ─── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:.4rem;padding-top:2rem}
+.page-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-md);font-size:.875rem;border:1.5px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .2s;background:var(--surface)}
+.page-btn:hover{border-color:var(--gold);color:var(--gold)}
+.page-btn.active{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ─── ABOUT ─── */
+.about-stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem}
+.stack-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;text-align:center;transition:all .25s}
+.stack-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.stack-icon{font-size:2rem;margin-bottom:.75rem}
+.stack-name{font-weight:600;font-size:.875rem;color:var(--navy);margin-bottom:.25rem}
+[data-theme="dark"] .stack-name{color:var(--white)}
+.stack-desc{font-size:.75rem;color:var(--text-muted)}
+.author-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:2.5rem;display:flex;gap:2rem;align-items:center}
+.author-avatar{width:100px;height:100px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:2rem;color:var(--gold);flex-shrink:0;border:3px solid var(--gold)}
+.author-name{font-family:var(--font-head);font-size:1.5rem;color:var(--navy);margin-bottom:.25rem}
+[data-theme="dark"] .author-name{color:var(--white)}
+.author-handle{font-family:var(--font-mono);color:var(--gold);font-size:.875rem;margin-bottom:.75rem}
+.author-bio{font-size:.925rem;color:var(--text-muted);line-height:1.7;margin-bottom:1rem}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;top:80px;right:1.5rem;background:var(--navy);color:var(--white);border-left:4px solid var(--gold);border-radius:var(--r-md);padding:.85rem 1.25rem;font-size:.875rem;box-shadow:var(--sh-lg);z-index:999;animation:slideIn .3s ease;max-width:320px}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ─── MODAL OVERLAY ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--r-xl);padding:2.5rem;max-width:520px;width:100%;position:relative;animation:modalIn .25s ease;max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{position:absolute;top:1.25rem;right:1.25rem;width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;transition:all .2s}
+.modal-close:hover{background:var(--bg-alt);color:var(--text)}
+.modal-title{font-family:var(--font-head);font-size:1.5rem;color:var(--navy);margin-bottom:1.5rem}
+[data-theme="dark"] .modal-title{color:var(--white)}
+
+/* ─── DIVIDER ─── */
+.gold-divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:3rem 0;opacity:.4}
+
+/* ─── MISC ─── */
+.text-gold{color:var(--gold)}.text-navy{color:var(--navy)}.text-muted{color:var(--text-muted)}
+.mono{font-family:var(--font-mono)}
+.empty-state{text-align:center;padding:4rem 2rem}
+.empty-state-icon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+.empty-state h3{font-family:var(--font-head);font-size:1.25rem;color:var(--text);margin-bottom:.5rem}
+.empty-state p{font-size:.9rem;color:var(--text-muted)}
+.results-meta{font-size:.875rem;color:var(--text-muted);margin-bottom:1.25rem}
+.results-meta strong{color:var(--navy);font-family:var(--font-mono)}
+[data-theme="dark"] .results-meta strong{color:var(--gold)}
+.phase-badge{display:inline-flex;align-items:center;gap:.35rem;background:rgba(199,150,57,.15);border:1px solid rgba(199,150,57,.3);color:var(--gold);font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:var(--r-full);text-transform:uppercase;letter-spacing:.05em}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero-content{grid-template-columns:1fr;gap:2rem}
+  .hero-visual{display:none}
+  .africa-layout{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .profile-hero-inner{flex-direction:column;text-align:center}
+  .nav-links{display:none}
+  .job-card{flex-direction:column}
+  .author-card{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════ -->
+<header class="site-header">
+  <nav class="navbar">
+    <div class="logo" onclick="navigate('home')">
+      <span class="logo-globe">🌍</span>
+      Afri<span>Dev</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" data-page="home" onclick="navigate('home')">Home</button>
+      <button class="nav-link" data-page="developers" onclick="navigate('developers')">Developers</button>
+      <button class="nav-link" data-page="repositories" onclick="navigate('repositories')">Repositories</button>
+      <button class="nav-link" data-page="activity" onclick="navigate('activity')">Activity</button>
+      <button class="nav-link" data-page="jobs" onclick="navigate('jobs')">Jobs <span class="phase-badge" style="margin-left:2px">P2</span></button>
+      <button class="nav-link" data-page="community" onclick="navigate('community')">Community <span class="phase-badge" style="margin-left:2px">P2</span></button>
+      <button class="nav-link" data-page="cofounders" onclick="navigate('cofounders')">Co-Founders <span class="phase-badge" style="margin-left:2px">P2</span></button>
+      <button class="nav-link" data-page="about" onclick="navigate('about')">About</button>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-rate">
+        <div class="rate-bar-wrap"><div class="rate-bar-fill" id="rateFill"></div></div>
+        <span id="rateLabel">45/60</span>
+      </div>
+      <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" title="Toggle dark mode">🌙</button>
+      <button class="btn btn-primary btn-sm" onclick="showToast('Sign in coming in Phase 2! 🚀','info')">Sign In</button>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══════════════════ PAGE: HOME ═══════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div>
+          <div class="hero-eyebrow">🌍 Africa's Developer Network</div>
+          <h1 class="hero-title">Discover <em>African</em> Developer Talent</h1>
+          <p class="hero-sub">Explore thousands of software developers and open-source projects from 54 African nations — powered by GitHub.</p>
+          <div class="hero-search-wrap">
+            <input class="hero-search-input" type="text" placeholder="Search by name, country, or tech..." id="heroSearch"/>
+            <button class="btn btn-primary" onclick="doHeroSearch()">Search</button>
+          </div>
+          <div class="country-pills">
+            <span class="cpill active" onclick="filterCountry(this,'Kenya')">🇰🇪 Kenya</span>
+            <span class="cpill" onclick="filterCountry(this,'Nigeria')">🇳🇬 Nigeria</span>
+            <span class="cpill" onclick="filterCountry(this,'Ghana')">🇬🇭 Ghana</span>
+            <span class="cpill" onclick="filterCountry(this,'South Africa')">🇿🇦 South Africa</span>
+            <span class="cpill" onclick="filterCountry(this,'Egypt')">🇪🇬 Egypt</span>
+            <span class="cpill" onclick="filterCountry(this,'Ethiopia')">🇪🇹 Ethiopia</span>
+            <span class="cpill" onclick="filterCountry(this,'Rwanda')">🇷🇼 Rwanda</span>
+          </div>
+          <div class="hero-stats">
+            <div class="hstat"><span class="hstat-num">54</span><span class="hstat-lbl">Countries</span></div>
+            <div class="hstat"><span class="hstat-num">100K+</span><span class="hstat-lbl">Developers</span></div>
+            <div class="hstat"><span class="hstat-num">500K+</span><span class="hstat-lbl">Repos</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="globe-wrap">
+            <div class="orbit orbit-1"><div style="width:30px;height:30px;border-radius:50%;background:var(--gold-muted);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:.7rem">🇰🇪</div></div>
+            <div class="orbit orbit-2"><div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.7rem">🇳🇬</div></div>
+            <div class="orbit orbit-3"><div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.7rem">🇿🇦</div></div>
+            <div class="globe-emoji">🌍</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Strip -->
+  <div class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item"><span class="stat-num" data-count="54">0</span><div class="stat-lbl">African Nations</div></div>
+        <div class="stat-item"><span class="stat-num" data-count="100">0</span><div class="stat-lbl">Thousand+ Devs</div></div>
+        <div class="stat-item"><span class="stat-num" data-count="500">0</span><div class="stat-lbl">Thousand+ Repos</div></div>
+        <div class="stat-item"><span class="stat-num">∞</span><div class="stat-lbl">Opportunities</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Developers -->
+  <section class="section">
+    <div class="container">
+      <div class="sh">
+        <div class="sh-left"><div class="label">🧑‍💻 Community</div><h2>Featured Developers</h2></div>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('developers')">View All →</button>
+      </div>
+      <div class="cards-grid" id="homeFeaturedDevs"></div>
+    </div>
+  </section>
+
+  <!-- Africa Map -->
+  <section class="africa-section">
+    <div class="container">
+      <div class="africa-layout">
+        <div class="africa-map-wrap">
+          <svg class="africa-map-svg" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+            <!-- Simplified Africa country shapes -->
+            <path class="map-country d-high" id="KE" d="M240,230 L260,220 L270,240 L255,265 L235,260 Z" title="Kenya"/>
+            <path class="map-country d-high" id="NG" d="M155,210 L185,205 L190,225 L170,240 L150,230 Z" title="Nigeria"/>
+            <path class="map-country d-med" id="ZA" d="M185,390 L230,380 L245,410 L225,430 L190,425 L175,410 Z" title="South Africa"/>
+            <path class="map-country d-med" id="EG" d="M200,80 L240,75 L245,110 L210,115 L195,100 Z" title="Egypt"/>
+            <path class="map-country d-med" id="GH" d="M145,230 L165,225 L168,248 L148,252 L140,242 Z" title="Ghana"/>
+            <path class="map-country d-low" id="ET" d="M245,200 L275,195 L285,220 L260,235 L240,225 Z" title="Ethiopia"/>
+            <path class="map-country d-low" id="TZ" d="M240,270 L268,265 L272,295 L248,300 L235,288 Z" title="Tanzania"/>
+            <path class="map-country d-low" id="RW" d="M232,255 L245,252 L247,265 L234,268 Z" title="Rwanda"/>
+            <path class="map-country" id="CD" d="M200,250 L235,245 L238,285 L205,290 L195,270 Z" title="DRC"/>
+            <path class="map-country" id="MA" d="M140,90 L175,85 L178,115 L145,120 L135,105 Z" title="Morocco"/>
+            <path class="map-country" id="DZ" d="M155,100 L200,90 L205,145 L165,150 L145,130 Z" title="Algeria"/>
+            <path class="map-country" id="SN" d="M110,195 L135,192 L138,210 L115,215 L105,207 Z" title="Senegal"/>
+            <path class="map-country" id="CM" d="M175,225 L200,220 L205,250 L180,255 L168,242 Z" title="Cameroon"/>
+            <path class="map-country" id="AO" d="M178,290 L210,285 L215,325 L182,330 L170,312 Z" title="Angola"/>
+            <path class="map-country" id="MZ" d="M240,300 L265,295 L270,360 L242,365 L228,340 Z" title="Mozambique"/>
+            <path class="map-country" id="ZM" d="M210,295 L242,290 L246,320 L214,328 L200,312 Z" title="Zambia"/>
+            <path class="map-country" id="ZW" d="M225,330 L250,325 L254,352 L228,358 L215,345 Z" title="Zimbabwe"/>
+            <path class="map-country" id="UG" d="M232,240 L252,235 L256,258 L234,263 L224,252 Z" title="Uganda"/>
+            <path class="map-country" id="CI" d="M130,225 L155,222 L158,245 L133,250 L122,238 Z" title="Côte d'Ivoire"/>
+            <!-- Country labels for high density -->
+            <text x="250" y="248" fill="rgba(255,255,255,.7)" font-size="7" font-family="DM Sans" text-anchor="middle">🇰🇪 Kenya</text>
+            <text x="170" y="225" fill="rgba(255,255,255,.7)" font-size="7" font-family="DM Sans" text-anchor="middle">🇳🇬 Nigeria</text>
+            <text x="212" y="408" fill="rgba(255,255,255,.7)" font-size="7" font-family="DM Sans" text-anchor="middle">🇿🇦 SA</text>
+          </svg>
+          <div class="map-legend">
+            <div class="ml-item"><div class="ml-dot" style="background:#16A34A"></div>High density</div>
+            <div class="ml-item"><div class="ml-dot" style="background:#2A5080"></div>Medium</div>
+            <div class="ml-item"><div class="ml-dot" style="background:#1A395B"></div>Growing</div>
+          </div>
+        </div>
+        <div class="africa-info">
+          <div class="label" style="color:var(--gold);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Developer Density</div>
+          <h2>54 Nations, One Dev Community</h2>
+          <p>AfriDev Explorer maps GitHub developer activity across the African continent. Click any country to filter developers from that nation.</p>
+          <div class="country-stats-grid">
+            <div class="cstat"><div class="cstat-num">32K+</div><div class="cstat-lbl">🇰🇪 Kenya</div></div>
+            <div class="cstat"><div class="cstat-num">28K+</div><div class="cstat-lbl">🇳🇬 Nigeria</div></div>
+            <div class="cstat"><div class="cstat-num">18K+</div><div class="cstat-lbl">🇿🇦 South Africa</div></div>
+            <div class="cstat"><div class="cstat-num">14K+</div><div class="cstat-lbl">🇪🇬 Egypt</div></div>
+            <div class="cstat"><div class="cstat-num">9K+</div><div class="cstat-lbl">🇬🇭 Ghana</div></div>
+            <div class="cstat"><div class="cstat-num">7K+</div><div class="cstat-lbl">🇷🇼 Rwanda</div></div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <button class="btn btn-outline" onclick="navigate('developers')">Browse All Developers →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Leaderboard -->
+  <section class="section">
+    <div class="container">
+      <div class="sh">
+        <div class="sh-left"><div class="label">📊 Insights</div><h2>Top Languages by African Devs</h2></div>
+      </div>
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+  </section>
+
+  <!-- Trending Repos -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="sh">
+        <div class="sh-left"><div class="label">🚀 Open Source</div><h2>Trending African Repos</h2></div>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('repositories')">View All →</button>
+      </div>
+      <div class="cards-grid cards-grid-3" id="homeTrendingRepos"></div>
+    </div>
+  </section>
+
+  <!-- African Dev of the Week -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--r-xl);padding:2.5rem;display:flex;gap:2rem;align-items:center;border:1px solid rgba(199,150,57,.3)">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;border:3px solid rgba(255,255,255,.2)">👨‍💻</div>
+        <div style="flex:1">
+          <div style="font-size:.7rem;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">⭐ Developer of the Week</div>
+          <h3 style="font-family:var(--font-head);font-size:1.4rem;color:var(--white);margin-bottom:.25rem">Keziah Moselle</h3>
+          <p style="font-size:.875rem;color:rgba(255,255,255,.6);margin-bottom:.75rem">Senior fullstack engineer from Nairobi building open-source tools for African developers. Maintainer of <span style="color:var(--gold)">@AfriCLI</span> — 1.2K stars.</p>
+          <button class="btn btn-primary btn-sm" onclick="navigate('profile')">View Profile →</button>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--font-mono);font-size:.8rem;color:rgba(255,255,255,.4)">🇰🇪 Kenya</div>
+          <div style="font-family:var(--font-mono);font-size:1.5rem;font-weight:600;color:var(--gold)">1.2K ⭐</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4)">stars this week</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Activity Feed -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="sh">
+        <div class="sh-left"><div class="label">⚡ Real-time</div><h2>Live Activity Feed</h2></div>
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-muted)">
+          <span class="live-dot"></span>LIVE · Updates every 60s
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem">
+        <div id="homeActivity"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="container">
+      <h2>Ready to Explore African Tech?</h2>
+      <p>Join thousands discovering the next generation of African software developers.</p>
+      <div class="cta-actions">
+        <button class="btn btn-primary" onclick="navigate('developers')">Browse Developers</button>
+        <button class="btn btn-outline" onclick="navigate('repositories')">Explore Repos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PAGE: DEVELOPERS ═══════════════════ -->
+<div id="page-developers" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label">👩‍💻 Developers</div>
+      <h1 class="ph-title">African Developers</h1>
+      <p class="ph-sub">Search and explore GitHub developers from 54 African nations.</p>
+      <div class="ph-badge" id="devCount">✓ 100,000+ developers indexed</div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container">
+      <div class="filter-bar">
+        <select class="filter-select" id="devCountry" onchange="renderDevs()">
+          <option value="">🌍 All Africa</option>
+          <option>Kenya</option><option>Nigeria</option><option>Ghana</option>
+          <option>South Africa</option><option>Egypt</option><option>Ethiopia</option>
+          <option>Rwanda</option><option>Uganda</option><option>Tanzania</option>
+          <option>Cameroon</option><option>Senegal</option><option>Morocco</option>
+        </select>
+        <input class="filter-input" type="text" placeholder="Search username..." id="devSearch" oninput="renderDevs()"/>
+        <input type="date" class="filter-select" id="dateFrom" style="cursor:pointer"/>
+        <input type="date" class="filter-select" id="dateTo" style="cursor:pointer"/>
+        <select class="filter-select" onchange="renderDevs()">
+          <option>Most Followers</option><option>Most Repos</option><option>Newest</option>
+        </select>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchDevTab(this,'all')">All Developers</button>
+        <button class="tab-btn" onclick="switchDevTab(this,'tech')">By Technology</button>
+        <button class="tab-btn" onclick="switchDevTab(this,'cofounders')">Co-Founders</button>
+        <button class="tab-btn" onclick="switchDevTab(this,'hiring')">Hiring</button>
+      </div>
+      <!-- Tech pills (shown on By Technology tab) -->
+      <div id="techPillsWrap" style="display:none" class="tech-pills-wrap">
+        <div class="tech-pills-group">
+          <label>Languages</label>
+          <div class="tech-pills">
+            <span class="tech-pill active" onclick="selectTech(this)">JavaScript</span>
+            <span class="tech-pill" onclick="selectTech(this)">TypeScript</span>
+            <span class="tech-pill" onclick="selectTech(this)">Python</span>
+            <span class="tech-pill" onclick="selectTech(this)">Go</span>
+            <span class="tech-pill" onclick="selectTech(this)">Rust</span>
+            <span class="tech-pill" onclick="selectTech(this)">Java</span>
+            <span class="tech-pill" onclick="selectTech(this)">PHP</span>
+            <span class="tech-pill" onclick="selectTech(this)">C++</span>
+            <span class="tech-pill" onclick="selectTech(this)">Ruby</span>
+            <span class="tech-pill" onclick="selectTech(this)">Swift</span>
+            <span class="tech-pill" onclick="selectTech(this)">Kotlin</span>
+            <span class="tech-pill" onclick="selectTech(this)">Dart</span>
+          </div>
+        </div>
+        <div class="tech-pills-group">
+          <label>Frameworks</label>
+          <div class="tech-pills">
+            <span class="tech-pill" onclick="selectTech(this)">React</span>
+            <span class="tech-pill" onclick="selectTech(this)">Vue</span>
+            <span class="tech-pill" onclick="selectTech(this)">Django</span>
+            <span class="tech-pill" onclick="selectTech(this)">Laravel</span>
+            <span class="tech-pill" onclick="selectTech(this)">Spring</span>
+            <span class="tech-pill" onclick="selectTech(this)">Flutter</span>
+            <span class="tech-pill" onclick="selectTech(this)">Next.js</span>
+            <span class="tech-pill" onclick="selectTech(this)">Rails</span>
+            <span class="tech-pill" onclick="selectTech(this)">FastAPI</span>
+            <span class="tech-pill" onclick="selectTech(this)">Express</span>
+          </div>
+        </div>
+      </div>
+      <div class="results-meta" id="devResultsMeta"></div>
+      <div class="cards-grid" id="devsGrid"></div>
+      <!-- Bookmarks section -->
+      <div id="bookmarksSection" style="display:none;margin-top:3rem">
+        <div class="gold-divider"></div>
+        <div class="sh">
+          <div class="sh-left"><div class="label">⭐ Saved</div><h2>Your Bookmarks</h2></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportBookmarks()">Export JSON</button>
+        </div>
+        <div id="bookmarksGrid" class="cards-grid"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: REPOSITORIES ═══════════════════ -->
+<div id="page-repositories" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label">🚀 Open Source</div>
+      <h1 class="ph-title">African Open Source</h1>
+      <p class="ph-sub">Discover trending repositories built by African developers on GitHub.</p>
+      <div class="ph-badge">✓ 500,000+ repositories indexed</div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container">
+      <div class="filter-bar">
+        <select class="filter-select" id="repoLang" onchange="renderRepos()">
+          <option value="">All Languages</option>
+          <option>JavaScript</option><option>TypeScript</option><option>Python</option>
+          <option>Go</option><option>Rust</option><option>Java</option>
+          <option>PHP</option><option>C++</option><option>Ruby</option><option>Dart</option>
+        </select>
+        <select class="filter-select" id="repoCountry" onchange="renderRepos()">
+          <option value="">🌍 All Africa</option>
+          <option>Kenya</option><option>Nigeria</option><option>South Africa</option>
+          <option>Ghana</option><option>Egypt</option>
+        </select>
+        <select class="filter-select" onchange="renderRepos()">
+          <option>Most Stars</option><option>Most Forks</option><option>Recently Updated</option>
+        </select>
+      </div>
+      <div class="results-meta" id="repoResultsMeta"></div>
+      <div class="cards-grid cards-grid-3" id="reposGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: PROFILE ═══════════════════ -->
+<div id="page-profile" class="page">
+  <div class="profile-hero">
+    <div class="container">
+      <div class="profile-hero-inner">
+        <div class="profile-avatar-lg">👩‍💻</div>
+        <div class="profile-meta">
+          <h1>Keziah Moselle</h1>
+          <div class="profile-username">@kezmoselle</div>
+          <div class="profile-location">📍 Nairobi, Kenya</div>
+          <div class="profile-bio">Fullstack developer building open-source tools for the African tech ecosystem. Creator of AfriCLI. Open to co-founding opportunities in developer tooling.</div>
+          <div class="badges" style="margin-bottom:.5rem">
+            <span class="badge badge-open">🟢 Open to Work</span>
+            <span class="badge badge-cofounder">🤝 Co-Founder</span>
+            <span class="badge badge-lang">TypeScript</span>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Profile link copied! 🔗')">🔗 Copy Link</button>
+            <button class="btn btn-ghost btn-sm" id="profileBookmarkBtn" onclick="toggleProfileBookmark()">☆ Bookmark</button>
+            <a class="btn btn-ghost btn-sm" href="https://github.com" target="_blank" rel="noopener">View on GitHub ↗</a>
+          </div>
+          <div class="profile-stats-row">
+            <div class="pstat"><span class="pstat-num">47</span><span class="pstat-lbl">Repos</span></div>
+            <div class="pstat"><span class="pstat-num">3.2K</span><span class="pstat-lbl">Followers</span></div>
+            <div class="pstat"><span class="pstat-num">218</span><span class="pstat-lbl">Following</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container" style="display:grid;grid-template-columns:2fr 1fr;gap:2rem">
+      <div>
+        <!-- Heatmap -->
+        <div class="heatmap-wrap">
+          <h3>Contribution Activity</h3>
+          <div class="heatmap-grid" id="heatmapGrid"></div>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:.35rem;margin-top:.5rem;font-size:.75rem;color:var(--text-muted)">
+            Less
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--bg-alt)"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:#d1fae5"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:#6ee7b7"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:#047857"></div>
+            More
+          </div>
+        </div>
+        <!-- Top Repos -->
+        <div class="sh"><div class="sh-left"><div class="label">🚀 Work</div><h2>Top Repositories</h2></div></div>
+        <div class="cards-grid cards-grid-3" id="profileRepos"></div>
+        <!-- Similar Devs -->
+        <div class="sh" style="margin-top:2rem"><div class="sh-left"><div class="label">🔗 Discover</div><h2>Similar Developers</h2></div></div>
+        <div class="cards-grid" id="similarDevs"></div>
+      </div>
+      <div>
+        <!-- Sidebar -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem">
+          <h3 style="font-family:var(--font-head);font-size:1rem;color:var(--navy);margin-bottom:1rem">Profile Details</h3>
+          <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.875rem;color:var(--text-muted)">
+            <div>🌐 <a href="#" style="color:var(--gold)">kezmoselle.dev</a></div>
+            <div>🐦 <a href="#" style="color:var(--gold)">@kezmoselle</a></div>
+            <div>💼 <a href="#" style="color:var(--gold)">LinkedIn</a></div>
+            <div>📅 Joined March 2019</div>
+            <div>💰 Open to freelance</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem">
+          <h3 style="font-family:var(--font-head);font-size:1rem;color:var(--navy);margin-bottom:1rem">Skills (12 endorsements)</h3>
+          <div class="badges" style="flex-direction:column;align-items:flex-start">
+            <span class="badge badge-lang" style="width:100%;justify-content:space-between">TypeScript <strong class="mono" style="color:var(--navy)">8</strong></span>
+            <span class="badge badge-lang" style="width:100%;justify-content:space-between">Node.js <strong class="mono" style="color:var(--navy)">6</strong></span>
+            <span class="badge badge-lang" style="width:100%;justify-content:space-between">React <strong class="mono" style="color:var(--navy)">5</strong></span>
+            <span class="badge badge-lang" style="width:100%;justify-content:space-between">PostgreSQL <strong class="mono" style="color:var(--navy)">3</strong></span>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.75rem" onclick="showToast('Endorsement requires sign in — coming in Phase 2! 🎯')">+ Endorse Skill</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem">
+          <h3 style="font-family:var(--font-head);font-size:1rem;color:var(--navy);margin-bottom:.75rem">Availability</h3>
+          <div class="badge badge-open" style="font-size:.8rem;padding:.35rem .85rem">🟢 Open to Work</div>
+          <div style="margin-top:.75rem;font-size:.8rem;color:var(--text-muted)">Preferred: Remote · Part-time</div>
+          <div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">Rate: $35–55/hr USD</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;margin-top:1rem" onclick="showToast('Messaging available in Phase 2! 💬')">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: ACTIVITY ═══════════════════ -->
+<div id="page-activity" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label">⚡ Real-time</div>
+      <h1 class="ph-title">Live Activity Feed</h1>
+      <p class="ph-sub">Watch African developers push code, open PRs, and star repos — live.</p>
+      <div class="ph-badge"><span class="live-dot"></span>LIVE · Auto-refreshes every 60 seconds</div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container">
+      <div class="filter-bar">
+        <button class="btn btn-ghost btn-sm active-filter" onclick="filterActivity('all',this)">All Events</button>
+        <button class="btn btn-ghost btn-sm" onclick="filterActivity('push',this)">🔨 Pushes</button>
+        <button class="btn btn-ghost btn-sm" onclick="filterActivity('pr',this)">🔀 PRs</button>
+        <button class="btn btn-ghost btn-sm" onclick="filterActivity('star',this)">⭐ Stars</button>
+        <button class="btn btn-ghost btn-sm" onclick="filterActivity('fork',this)">🍴 Forks</button>
+        <button class="btn btn-ghost btn-sm" onclick="filterActivity('create',this)">🚀 New Repos</button>
+        <select class="filter-select" style="margin-left:auto">
+          <option>🌍 All Africa</option>
+          <option>🇰🇪 Kenya</option><option>🇳🇬 Nigeria</option><option>🇬🇭 Ghana</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:2rem">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem">
+          <div id="activityFeed"></div>
+        </div>
+        <div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem">
+            <h3 style="font-family:var(--font-head);font-size:1rem;margin-bottom:1rem;color:var(--navy)">📊 Event Breakdown</h3>
+            <div id="eventBreakdown"></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem">
+            <h3 style="font-family:var(--font-head);font-size:1rem;margin-bottom:.75rem;color:var(--navy)">🔥 Most Active</h3>
+            <div id="mostActive"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: JOBS ═══════════════════ -->
+<div id="page-jobs" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label" style="display:flex;align-items:center;gap:.5rem">💼 Phase 2 Feature <span class="phase-badge">P2</span></div>
+      <h1 class="ph-title">African Tech Jobs</h1>
+      <p class="ph-sub">Find remote and local tech opportunities from African companies and global employers hiring African talent.</p>
+      <div class="ph-badge">✓ 250+ active listings</div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container">
+      <div style="background:var(--gold-muted);border:1px solid rgba(199,150,57,.3);border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.875rem;color:var(--gold-dark);display:flex;align-items:center;gap:.75rem">
+        🚧 <strong>Phase 2 Feature:</strong> Job board with Convex backend + WorkOS auth coming soon. Showing sample data.
+        <button class="btn btn-primary btn-xs" style="margin-left:auto" onclick="showToast('Phase 2 launching soon! 🚀')">Get Notified</button>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select"><option>🌍 All Countries</option><option>Kenya</option><option>Nigeria</option><option>South Africa</option><option>Remote</option></select>
+        <select class="filter-select"><option>All Tech</option><option>JavaScript</option><option>Python</option><option>Go</option><option>Java</option></select>
+        <select class="filter-select"><option>All Types</option><option>Remote</option><option>Hybrid</option><option>On-site</option></select>
+        <select class="filter-select"><option>All Roles</option><option>Full-time</option><option>Contract</option><option>Internship</option></select>
+        <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="showToast('Post a job requires employer account — Phase 2!')">+ Post a Job</button>
+      </div>
+      <div id="jobsGrid" style="display:flex;flex-direction:column;gap:1rem"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: COMMUNITY ═══════════════════ -->
+<div id="page-community" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label" style="display:flex;align-items:center;gap:.5rem">💬 Phase 2 Feature <span class="phase-badge">P2</span></div>
+      <h1 class="ph-title">Developer Community</h1>
+      <p class="ph-sub">Share what you're building, ask questions, celebrate wins, and connect with African developers.</p>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container" style="display:grid;grid-template-columns:1fr 300px;gap:2rem">
+      <div>
+        <div style="background:var(--gold-muted);border:1px solid rgba(199,150,57,.3);border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.875rem;color:var(--gold-dark)">
+          🚧 <strong>Phase 2 Feature:</strong> Real-time community feed powered by Convex subscriptions.
+        </div>
+        <div class="new-post-box">
+          <div class="new-post-top">
+            <div class="new-post-avatar">M</div>
+            <textarea class="new-post-textarea" placeholder="What are you building? Share a win, ask a question... #NairobiDevs" id="newPostContent" oninput="updateCharCount()" maxlength="500"></textarea>
+          </div>
+          <div class="new-post-footer">
+            <select class="post-type-select"><option>General</option><option>Question</option><option>Looking to Build</option><option>Win</option><option>Event</option></select>
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <span class="char-count" id="charCount">0/500</span>
+              <button class="btn btn-primary btn-sm" onclick="addPost()">Post</button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter tabs -->
+        <div class="tab-bar" style="margin-bottom:1.5rem">
+          <button class="tab-btn active" onclick="switchPostFilter(this,'all')">All</button>
+          <button class="tab-btn" onclick="switchPostFilter(this,'question')">Questions</button>
+          <button class="tab-btn" onclick="switchPostFilter(this,'build')">Looking to Build</button>
+          <button class="tab-btn" onclick="switchPostFilter(this,'win')">Wins 🎉</button>
+        </div>
+        <div id="communityFeed"></div>
+      </div>
+      <div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem">
+          <h3 style="font-family:var(--font-head);font-size:1rem;margin-bottom:1rem;color:var(--navy)">🔥 Trending Hashtags</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem" id="trendingTags"></div>
+        </div>
+        <div style="background:var(--navy);border-radius:var(--r-lg);padding:1.25rem">
+          <h3 style="font-family:var(--font-head);font-size:1rem;margin-bottom:.75rem;color:var(--white)">Join the Community</h3>
+          <p style="font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:1rem">Sign up to post, like, comment, and connect with African developers.</p>
+          <button class="btn btn-primary btn-sm" style="width:100%" onclick="showToast('Sign up available in Phase 2! 🚀')">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: CO-FOUNDERS ═══════════════════ -->
+<div id="page-cofounders" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label" style="display:flex;align-items:center;gap:.5rem">🤝 Phase 2 Feature <span class="phase-badge">P2</span></div>
+      <h1 class="ph-title">Find Your Co-Founder</h1>
+      <p class="ph-sub">Connect with driven African developers looking to build the next big thing together.</p>
+      <div class="ph-badge">✓ 48 active listings</div>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container">
+      <div style="background:var(--gold-muted);border:1px solid rgba(199,150,57,.3);border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.875rem;color:var(--gold-dark);display:flex;align-items:center;gap:.75rem">
+        🚧 <strong>Phase 2 Feature:</strong> Co-founder board with Convex backend.
+        <button class="btn btn-primary btn-xs" style="margin-left:auto" onclick="showToast('Phase 2 launching soon! 🚀')">Post a Listing</button>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="cfStage" onchange="renderCofounders()"><option value="">All Stages</option><option value="idea">Idea</option><option value="prototype">Prototype</option><option value="mvp">MVP</option><option value="revenue">Revenue</option></select>
+        <select class="filter-select" id="cfCountry" onchange="renderCofounders()"><option value="">🌍 All Africa</option><option>Kenya</option><option>Nigeria</option><option>South Africa</option><option>Ghana</option></select>
+        <select class="filter-select"><option>All Commitments</option><option>Full-time</option><option>Part-time</option><option>Evenings</option></select>
+      </div>
+      <div class="cards-grid cards-grid-3" id="cofoundersGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ PAGE: ABOUT ═══════════════════ -->
+<div id="page-about" class="page">
+  <div class="page-header">
+    <div class="container page-header-content">
+      <div class="ph-label">ℹ️ About</div>
+      <h1 class="ph-title">About AfriDev Explorer</h1>
+      <p class="ph-sub">Making African developer talent more visible to the world.</p>
+    </div>
+  </div>
+  <section class="section">
+    <div class="container">
+      <div style="max-width:680px;margin:0 auto 4rem;text-align:center">
+        <h2 style="font-family:var(--font-head);font-size:2rem;color:var(--navy);margin-bottom:1rem">Why AfriDev Explorer?</h2>
+        <p style="color:var(--text-muted);line-height:1.8;font-size:1.05rem">Africa has over 700,000 software developers on GitHub — and that number grows every year. Yet African tech talent remains largely invisible to the global developer community. AfriDev Explorer exists to change that: to surface the incredible work happening across 54 African nations, connect developers with opportunity, and celebrate the people building Africa's digital future.</p>
+      </div>
+      <div class="sh"><div class="sh-left"><div class="label">🛠️ Stack</div><h2>Built With</h2></div></div>
+      <div class="about-stack-grid" style="margin-bottom:4rem">
+        <div class="stack-card"><div class="stack-icon">📄</div><div class="stack-name">HTML5</div><div class="stack-desc">Semantic markup</div></div>
+        <div class="stack-card"><div class="stack-icon">🎨</div><div class="stack-name">Vanilla CSS</div><div class="stack-desc">No frameworks</div></div>
+        <div class="stack-card"><div class="stack-icon">⚡</div><div class="stack-name">JavaScript</div><div class="stack-desc">ES2022+</div></div>
+        <div class="stack-card"><div class="stack-icon">🐙</div><div class="stack-name">GitHub API</div><div class="stack-desc">Public REST v3</div></div>
+        <div class="stack-card"><div class="stack-icon">🚀</div><div class="stack-name">GitHub Actions</div><div class="stack-desc">CI/CD pipeline</div></div>
+        <div class="stack-card"><div class="stack-icon">🧪</div><div class="stack-name">Jest</div><div class="stack-desc">Unit testing</div></div>
+        <div class="stack-card"><div class="stack-icon">⚡</div><div class="stack-name">Convex</div><div class="stack-desc">Phase 2 backend</div></div>
+        <div class="stack-card"><div class="stack-icon">🔐</div><div class="stack-name">WorkOS</div><div class="stack-desc">Phase 2 auth</div></div>
+      </div>
+      <div class="sh"><div class="sh-left"><div class="label">👨‍💻 Creator</div><h2>About the Author</h2></div></div>
+      <div class="author-card">
+        <div class="author-avatar">JA</div>
+        <div>
+          <div class="author-name">Jonathan Ayany</div>
+          <div class="author-handle">@Mylesoft · Myles</div>
+          <div class="author-bio">Self-taught fullstack developer and founder based in Nairobi, Kenya. Founder & CEO of MylesCorp Technologies. Building EduMyles, MylesCRM, and AfriDev Explorer — all focused on solving real African problems with software. Passionate about open source and developer communities across Africa.</div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening GitHub... 🐙')">🐙 github.com/Mylesoft</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📧 ayany004@gmail.com')">✉️ ayany004@gmail.com</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📞 +254 743 993 715')">📞 +254 743 993 715</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Footer (shared) -->
+<footer class="site-footer" id="siteFooter">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:.75rem">🌍 Afri<span>Dev</span></div>
+        <p>Discovering and celebrating African developer talent across 54 nations. Powered by the GitHub API.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <span class="footer-link" onclick="navigate('developers')">Developers</span>
+        <span class="footer-link" onclick="navigate('repositories')">Repositories</span>
+        <span class="footer-link" onclick="navigate('activity')">Activity</span>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <span class="footer-link" onclick="navigate('jobs')">Jobs Board</span>
+        <span class="footer-link" onclick="navigate('cofounders')">Co-Founders</span>
+        <span class="footer-link" onclick="navigate('community')">Community Feed</span>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <span class="footer-link" onclick="navigate('about')">About</span>
+        <span class="footer-link" onclick="showToast('Tech Spec v3.0 — 4,131 lines of documentation!')">Tech Spec</span>
+        <span class="footer-link" onclick="showToast('Opening GitHub... 🐙')">GitHub Repo</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 AfriDev Explorer — Built with Vanilla JS + GitHub API</div>
+      <div class="footer-author">By <span>Jonathan Ayany (Myles)</span> · Nairobi, Kenya</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const DEVS=[
+  {name:"Keziah Moselle",login:"kezmoselle",location:"Nairobi, Kenya",avatar:"👩‍💻",followers:3200,public_repos:47,bio:"co-founder TypeScript Node.js",top_language:"TypeScript",country:"Kenya"},
+  {name:"Emeka Okafor",login:"emekadev",location:"Lagos, Nigeria",avatar:"👨‍💻",followers:2100,public_repos:38,bio:"hiring React Python backend",top_language:"Python",country:"Nigeria"},
+  {name:"Amara Diallo",login:"amaradiallo",location:"Accra, Ghana",avatar:"🧑‍💻",followers:1800,public_repos:29,bio:"open to work Flutter mobile",top_language:"Dart",country:"Ghana"},
+  {name:"Sipho Dlamini",login:"siphodev",location:"Cape Town, South Africa",avatar:"👨‍💻",followers:4500,public_repos:62,bio:"Go Rust systems developer",top_language:"Go",country:"South Africa"},
+  {name:"Fatima Al-Rashidi",login:"fatimadev",location:"Cairo, Egypt",avatar:"👩‍💻",followers:990,public_repos:22,bio:"open to work co-founder AI ML",top_language:"Python",country:"Egypt"},
+  {name:"Kwame Asante",login:"kwamecodes",location:"Kumasi, Ghana",avatar:"🧑‍💻",followers:1350,public_repos:33,bio:"hiring JavaScript TypeScript fullstack",top_language:"JavaScript",country:"Ghana"},
+  {name:"Nadia Osei",login:"nadiabuilds",location:"Kigali, Rwanda",avatar:"👩‍💻",followers:780,public_repos:18,bio:"looking to build EdTech cofounder",top_language:"JavaScript",country:"Rwanda"},
+  {name:"Yusuf Mwangi",login:"yusufm",location:"Mombasa, Kenya",avatar:"👨‍💻",followers:560,public_repos:15,bio:"open to work Java Spring backend",top_language:"Java",country:"Kenya"},
+  {name:"Aaliya Hassan",login:"aaliyahassan",location:"Nairobi, Kenya",avatar:"👩‍💻",followers:2200,public_repos:41,bio:"we're hiring PHP Laravel fullstack",top_language:"PHP",country:"Kenya"},
+  {name:"Tunde Bakare",login:"tundedev",location:"Abuja, Nigeria",avatar:"🧑‍💻",followers:3800,public_repos:55,bio:"co-founder FinTech seeking technical co-founder",top_language:"TypeScript",country:"Nigeria"},
+  {name:"Grace Macharia",login:"gracemacharia",location:"Nairobi, Kenya",avatar:"👩‍💻",followers:1100,public_repos:24,bio:"open to work React frontend developer",top_language:"JavaScript",country:"Kenya"},
+  {name:"Olumide Adeyemi",login:"olumidedev",location:"Lagos, Nigeria",avatar:"👨‍💻",followers:2900,public_repos:48,bio:"hiring engineers join my team DevOps",top_language:"Go",country:"Nigeria"},
+];
+
+const REPOS=[
+  {full_name:"kezmoselle/africli",owner:{login:"kezmoselle",avatar:"👩‍💻"},description:"CLI toolkit for African developers — scaffold projects, manage deployments, generate boilerplate for popular African frameworks.",language:"TypeScript",stargazers_count:1240,forks_count:89,updated_at:"2025-01-10T08:00:00Z",html_url:"https://github.com"},
+  {full_name:"emekadev/naira-pay",owner:{login:"emekadev",avatar:"👨‍💻"},description:"Open-source M-Pesa and Flutterwave payment SDK for Node.js. Supports STK Push, bulk payments, and real-time webhooks.",language:"JavaScript",stargazers_count:980,forks_count:124,updated_at:"2025-01-08T10:00:00Z",html_url:"https://github.com"},
+  {full_name:"siphodev/go-safaricom",owner:{login:"siphodev",avatar:"👨‍💻"},description:"Idiomatic Go SDK for Safaricom Daraja API. Full M-Pesa integration including STK Push, C2B, B2C, and transaction status.",language:"Go",stargazers_count:750,forks_count:67,updated_at:"2025-01-05T12:00:00Z",html_url:"https://github.com"},
+  {full_name:"kwamecodes/afri-ui",owner:{login:"kwamecodes",avatar:"🧑‍💻"},description:"React component library built for African web applications. Includes Swahili/French/Arabic RTL support out of the box.",language:"TypeScript",stargazers_count:640,forks_count:58,updated_at:"2025-01-07T09:00:00Z",html_url:"https://github.com"},
+  {full_name:"fatimadev/arabic-nlp",owner:{login:"fatimadev",avatar:"👩‍💻"},description:"Arabic-first NLP toolkit for Egyptian developers. Tokenisation, stemming, sentiment analysis optimised for Egyptian Arabic dialect.",language:"Python",stargazers_count:420,forks_count:31,updated_at:"2024-12-28T14:00:00Z",html_url:"https://github.com"},
+  {full_name:"tundedev/fintrack-api",owner:{login:"tundedev",avatar:"🧑‍💻"},description:"RESTful financial tracking API built for Nigerian SMEs. Bank statement parsing, expense categorisation, and M-Pesa reconciliation.",language:"TypeScript",stargazers_count:395,forks_count:44,updated_at:"2025-01-09T11:00:00Z",html_url:"https://github.com"},
+];
+
+const ACTIVITIES=[
+  {type:"PushEvent",actor:{login:"kezmoselle",avatar:"👩‍💻"},repo:{name:"kezmoselle/africli"},created_at:"2025-01-10T08:30:00Z",country:"🇰🇪"},
+  {type:"PullRequestEvent",actor:{login:"siphodev",avatar:"👨‍💻"},repo:{name:"siphodev/go-safaricom"},created_at:"2025-01-10T08:10:00Z",country:"🇿🇦"},
+  {type:"WatchEvent",actor:{login:"emekadev",avatar:"👨‍💻"},repo:{name:"kezmoselle/africli"},created_at:"2025-01-10T07:55:00Z",country:"🇳🇬"},
+  {type:"ForkEvent",actor:{login:"amaradiallo",avatar:"🧑‍💻"},repo:{name:"emekadev/naira-pay"},created_at:"2025-01-10T07:40:00Z",country:"🇬🇭"},
+  {type:"CreateEvent",actor:{login:"nadiabuilds",avatar:"👩‍💻"},repo:{name:"nadiabuilds/edtech-api"},created_at:"2025-01-10T07:20:00Z",country:"🇷🇼"},
+  {type:"PushEvent",actor:{login:"kwamecodes",avatar:"🧑‍💻"},repo:{name:"kwamecodes/afri-ui"},created_at:"2025-01-10T07:05:00Z",country:"🇬🇭"},
+  {type:"IssuesEvent",actor:{login:"fatimadev",avatar:"👩‍💻"},repo:{name:"fatimadev/arabic-nlp"},created_at:"2025-01-10T06:50:00Z",country:"🇪🇬"},
+  {type:"PullRequestEvent",actor:{login:"tundedev",avatar:"🧑‍💻"},repo:{name:"tundedev/fintrack-api"},created_at:"2025-01-10T06:35:00Z",country:"🇳🇬"},
+  {type:"WatchEvent",actor:{login:"yusufm",avatar:"👨‍💻"},repo:{name:"siphodev/go-safaricom"},created_at:"2025-01-10T06:20:00Z",country:"🇰🇪"},
+  {type:"PushEvent",actor:{login:"gracemacharia",avatar:"👩‍💻"},repo:{name:"gracemacharia/react-mpesa"},created_at:"2025-01-10T06:00:00Z",country:"🇰🇪"},
+  {type:"ReleaseEvent",actor:{login:"olumidedev",avatar:"👨‍💻"},repo:{name:"olumidedev/k8s-africa"},created_at:"2025-01-10T05:45:00Z",country:"🇳🇬"},
+  {type:"ForkEvent",actor:{login:"aaliyahassan",avatar:"👩‍💻"},repo:{name:"kwamecodes/afri-ui"},created_at:"2025-01-10T05:30:00Z",country:"🇰🇪"},
+];
+
+const JOBS=[
+  {company:"Andela",logo:"🌍",title:"Senior Backend Engineer",location:"Remote (Africa)",country:"Remote",workType:"remote",jobType:"full_time",techStack:["Node.js","PostgreSQL","Redis","AWS"],salaryMin:5000,salaryMax:8000,currency:"USD/mo",posted:"2d ago"},
+  {company:"Flutterwave",logo:"💳",title:"Frontend Engineer — React",location:"Lagos, Nigeria",country:"Nigeria",workType:"hybrid",jobType:"full_time",techStack:["React","TypeScript","CSS","Jest"],salaryMin:3000,salaryMax:5000,currency:"USD/mo",posted:"3d ago"},
+  {company:"Mpesa Africa",logo:"📱",title:"Mobile Developer (Flutter)",location:"Nairobi, Kenya",country:"Kenya",workType:"hybrid",jobType:"full_time",techStack:["Flutter","Dart","Firebase","REST APIs"],salaryMin:2500,salaryMax:4000,currency:"USD/mo",posted:"5d ago"},
+  {company:"SafeBoda Tech",logo:"🛵",title:"DevOps / Platform Engineer",location:"Kampala, Uganda",country:"Uganda",workType:"onsite",jobType:"full_time",techStack:["Kubernetes","Terraform","Go","AWS"],salaryMin:3500,salaryMax:5500,currency:"USD/mo",posted:"1w ago"},
+  {company:"Paystack",logo:"💰",title:"Backend Engineer — Go",location:"Lagos, Nigeria",country:"Nigeria",workType:"remote",jobType:"full_time",techStack:["Go","PostgreSQL","Redis","gRPC"],salaryMin:4000,salaryMax:7000,currency:"USD/mo",posted:"1w ago"},
+  {company:"Chipper Cash",logo:"💸",title:"Data Engineer",location:"Remote (Africa)",country:"Remote",workType:"remote",jobType:"full_time",techStack:["Python","dbt","BigQuery","Airflow"],salaryMin:4500,salaryMax:7000,currency:"USD/mo",posted:"2w ago"},
+];
+
+const POSTS=[
+  {author:"Keziah Moselle",handle:"kezmoselle",avatar:"👩‍💻",role:"Fullstack Dev · Nairobi",time:"2h ago",type:"win",content:"Just hit 1,000 GitHub stars on #AfriCLI! Thank you to everyone who contributed and reported bugs. This is what community means. 🎉 #NairobiDevs #OpenSource",likes:48,comments:12},
+  {author:"Emeka Okafor",handle:"emekadev",avatar:"👨‍💻",role:"Backend Dev · Lagos",time:"4h ago",type:"build",content:"Looking for a co-founder to build the next fintech product for West Africa. I have the technical side covered — looking for someone with product/business experience. DM me or check my co-founder listing! #LookingToBuild #NigeriaDevs #FinTech",likes:32,comments:8},
+  {author:"Amara Diallo",handle:"amaradiallo",avatar:"🧑‍💻",role:"Mobile Dev · Accra",time:"6h ago",type:"question",content:"Anyone have experience integrating Ghanaian mobile money APIs (Vodafone Cash, AirtelTigo) into Flutter apps? The documentation is... lacking. Any tips? #Flutter #GhanaDevs #Question",likes:15,comments:21},
+  {author:"Sipho Dlamini",handle:"siphodev",avatar:"👨‍💻",role:"Go Engineer · Cape Town",time:"8h ago",type:"general",content:"Just published a deep-dive blog post on building high-performance REST APIs in Go for the African market — covering network latency optimisation for mobile-first users. Link in profile. #Go #Performance #AfricaTech",likes:67,comments:14},
+  {author:"Nadia Osei",handle:"nadiabuilds",avatar:"👩‍💻",role:"Dev · Kigali",time:"12h ago",type:"win",content:"Shipped my first client project today — a school management system for a secondary school in Rwanda. Built with Next.js and Convex. The look on the principal's face when it all worked was worth every bug. 🚀 #Win #Rwanda #EdTech",likes:89,comments:23},
+];
+
+const COFOUNDERS=[
+  {title:"Looking for CTO Co-Founder — HealthTech for East Africa",author:"Nadia Osei",avatar:"👩‍💻",stage:"prototype",description:"Building a telemedicine platform connecting rural communities in Rwanda and Uganda with certified doctors. We have $50K seed funding and our first 3 pilot hospitals onboarded. Looking for a technical co-founder with mobile experience.",skillsNeeded:["Flutter","Node.js","Healthcare APIs","System Design"],equity:"25-35%",commitment:"full_time",country:"Rwanda"},
+  {title:"Seeking Technical Co-Founder — Agri-Fintech Platform",author:"Kwame Asante",avatar:"🧑‍💻",stage:"idea",description:"Combining satellite imagery analysis with micro-lending for smallholder farmers across West Africa. I have 8 years in agricultural finance and the business relationships. Need someone to build the ML and mobile stack.",skillsNeeded:["Python","ML/AI","React Native","PostgreSQL"],equity:"40-50%",commitment:"evenings",country:"Ghana"},
+  {title:"Co-Founder Wanted — B2B SaaS for African SMEs",author:"Tunde Bakare",avatar:"🧑‍💻",stage:"mvp",description:"Our MVP has 12 paying SME customers in Nigeria managing their inventory and accounting on our platform. Monthly revenue: $2,400. Looking for a co-founder with growth/marketing expertise.",skillsNeeded:["Growth Marketing","Sales","Product","Data Analytics"],equity:"20-30%",commitment:"full_time",country:"Nigeria"},
+  {title:"Looking to Build — Developer Education Platform",author:"Aaliya Hassan",avatar:"👩‍💻",stage:"idea",description:"Want to build an Africanised developer education platform — tutorials, projects, and mentorship all focused on problems relevant to the African context. Think Codecademy meets real African use cases.",skillsNeeded:["Next.js","Content Strategy","Video Production","Community Building"],equity:"50%",commitment:"part_time",country:"Kenya"},
+  {title:"Technical Co-Founder — Logistics & Last-Mile Delivery",author:"Emeka Okafor",avatar:"👨‍💻",stage:"revenue",description:"Currently doing $18K MRR connecting SMEs with verified last-mile delivery partners across Lagos. The manual ops are breaking us — need a CTO to help us build the automation layer.",skillsNeeded:["Mobile Dev","Maps/Routing APIs","Backend","Operations Tech"],equity:"15-25%",commitment:"full_time",country:"Nigeria"},
+  {title:"Seeking Design Co-Founder — Legal Tech Platform",author:"Sipho Dlamini",avatar:"👨‍💻",stage:"prototype",description:"Building automated legal document generation and contract management for African startups and SMEs. We have the legal team and the technical architecture — missing strong UX/design.",skillsNeeded:["UI/UX Design","Product Design","Figma","User Research"],equity:"20-30%",commitment:"part_time",country:"South Africa"},
+];
+
+const LEADERBOARD_DATA=[
+  {lang:"JavaScript",count:285000,pct:95,color:"#f7df1e"},
+  {lang:"Python",count:198000,pct:66,color:"#3776AB"},
+  {lang:"TypeScript",count:142000,pct:47,color:"#3178c6"},
+  {lang:"PHP",count:98000,pct:33,color:"#8892BF"},
+  {lang:"Java",count:87000,pct:29,color:"#B07219"},
+  {lang:"Go",count:54000,pct:18,color:"#00ADD8"},
+  {lang:"C++",count:41000,pct:14,color:"#f34b7d"},
+  {lang:"Ruby",count:28000,pct:9,color:"#701516"},
+];
+
+const EVENT_CONFIG={
+  PushEvent:{icon:"🔨",label:"pushed commits to"},
+  PullRequestEvent:{icon:"🔀",label:"opened a PR in"},
+  IssuesEvent:{icon:"🐛",label:"opened an issue in"},
+  WatchEvent:{icon:"⭐",label:"starred"},
+  ForkEvent:{icon:"🍴",label:"forked"},
+  CreateEvent:{icon:"🚀",label:"created"},
+  ReleaseEvent:{icon:"📦",label:"released in"},
+  DeleteEvent:{icon:"🗑️",label:"deleted branch in"},
+};
+
+// ═══════════════════ STATE ═══════════════════
+let bookmarks=[],activeDevTab='all',activeTech='JavaScript',activePostFilter='all';
+let toastTimeout;
+
+// ═══════════════════ UTILS ═══════════════════
+function timeAgo(iso){
+  const diff=Date.now()-new Date(iso);
+  const m=Math.floor(diff/60000),h=Math.floor(diff/3600000),d=Math.floor(diff/86400000);
+  if(m<1)return'just now';if(m<60)return m+'m ago';if(h<24)return h+'h ago';return d+'d ago';
+}
+function fmtNum(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return n}
+function detectBio(bio=''){
+  const l=bio.toLowerCase();
+  return{
+    isOpen:/open to work|available|freelance|seeking/.test(l),
+    isCo:/co-?founder|cofounder|looking to build|seeking co/.test(l),
+    isHiring:/hiring|we'?re hiring|join my team|join us|open roles/.test(l),
+  };
+}
+
+// ═══════════════════ NAVIGATION ═══════════════════
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const pg=document.getElementById('page-'+page);
+  if(pg)pg.classList.add('active');
+  const btn=document.querySelector(`.nav-link[data-page="${page}"]`);
+  if(btn)btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='home'){renderHome();}
+  else if(page==='developers'){renderDevs();}
+  else if(page==='repositories'){renderRepos();}
+  else if(page==='profile'){renderProfile();}
+  else if(page==='activity'){renderActivity();}
+  else if(page==='jobs'){renderJobs();}
+  else if(page==='community'){renderCommunity();}
+  else if(page==='cofounders'){renderCofounders();}
+}
+
+// ═══════════════════ DEV CARD HTML ═══════════════════
+function devCardHTML(dev,size='normal'){
+  const bio=detectBio(dev.bio||'');
+  const isSaved=bookmarks.includes(dev.login);
+  const badges=[];
+  if(bio.isOpen)badges.push('<span class="badge badge-open">🟢 Open to Work</span>');
+  if(bio.isCo)badges.push('<span class="badge badge-cofounder">🤝 Co-Founder</span>');
+  if(bio.isHiring)badges.push('<span class="badge badge-hiring">💼 Hiring</span>');
+  if(dev.top_language)badges.push(`<span class="badge badge-lang">${dev.top_language}</span>`);
+  return`<div class="dev-card" onclick="navigate('profile')">
+    <div class="dev-card-header">
+      <div class="dev-avatar">${dev.avatar}</div>
+      <div class="dev-card-actions">
+        <button class="star-btn ${isSaved?'saved':''}" onclick="event.stopPropagation();toggleBm('${dev.login}',this)" title="Bookmark">${isSaved?'★':'☆'}</button>
+        <button class="star-btn" onclick="event.stopPropagation();showToast('Link copied! 🔗')" title="Share">🔗</button>
+      </div>
+    </div>
+    <div class="dev-name">${dev.name}</div>
+    <div class="dev-username">@${dev.login}</div>
+    ${dev.location?`<div class="dev-loc">📍 ${dev.location}</div>`:''}
+    <div class="badges">${badges.join('')}</div>
+    <div class="dev-card-footer">
+      <div class="dev-stats">
+        <div class="ds"><strong class="mono">${fmtNum(dev.followers)}</strong> followers</div>
+        <div class="ds"><strong class="mono">${dev.public_repos}</strong> repos</div>
+      </div>
+      <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();navigate('profile')">Profile →</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════ REPO CARD HTML ═══════════════════
+const LANG_COLORS={JavaScript:'#f1e05a',TypeScript:'#3178c6',Python:'#3572A5',Go:'#00ADD8',Rust:'#dea584',Java:'#b07219',PHP:'#4F5D95','C++':'#f34b7d',Ruby:'#701516',Dart:'#00B4AB'};
+function repoCardHTML(r){
+  const col=LANG_COLORS[r.language]||'#5A6478';
+  return`<div class="repo-card">
+    <div class="repo-header">
+      <div class="repo-avatar">${r.owner.avatar}</div>
+      <div>
+        <div class="repo-full-name">${r.full_name}</div>
+        ${r.language?`<div class="lang-badge-inline"><span class="lang-dot" style="background:${col}"></span>${r.language}</div>`:''}
+      </div>
+    </div>
+    <div class="repo-desc">${r.description||'No description.'}</div>
+    <div class="repo-footer">
+      <div class="repo-stat">⭐ ${fmtNum(r.stargazers_count)}</div>
+      <div class="repo-stat">🍴 ${fmtNum(r.forks_count)}</div>
+      <div class="repo-stat" style="margin-left:auto;font-size:.75rem">${timeAgo(r.updated_at)}</div>
+      <a href="${r.html_url}" target="_blank" rel="noopener" class="btn btn-outline btn-xs" onclick="event.stopPropagation()">↗</a>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════ ACTIVITY CARD HTML ═══════════════════
+function actCardHTML(ev){
+  const cfg=EVENT_CONFIG[ev.type]||{icon:'⚡',label:'did something in'};
+  return`<div class="activity-card">
+    <div class="activity-icon">${cfg.icon}</div>
+    <div class="activity-avatar">${ev.actor.avatar}</div>
+    <div class="activity-body">
+      <div class="activity-text"><a href="#" onclick="navigate('profile');return false">${ev.actor.login}</a> ${cfg.label} <a href="https://github.com" target="_blank" rel="noopener">${ev.repo.name}</a> ${ev.country||''}</div>
+      <div class="activity-time">${timeAgo(ev.created_at)}</div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════ RENDER: HOME ═══════════════════
+function renderHome(){
+  // Featured devs
+  const fd=document.getElementById('homeFeaturedDevs');
+  if(fd)fd.innerHTML=DEVS.slice(0,6).map(devCardHTML).join('');
+  // Trending repos
+  const tr=document.getElementById('homeTrendingRepos');
+  if(tr)tr.innerHTML=REPOS.slice(0,6).map(repoCardHTML).join('');
+  // Activity
+  const ha=document.getElementById('homeActivity');
+  if(ha)ha.innerHTML=ACTIVITIES.slice(0,6).map(actCardHTML).join('');
+  // Leaderboard
+  renderLeaderboard();
+  // Animate counters
+  animateCounters();
+}
+
+function renderLeaderboard(){
+  const el=document.getElementById('leaderboard');
+  if(!el)return;
+  el.innerHTML=LEADERBOARD_DATA.map((d,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank">${i+1}</div>
+      <div class="lb-lang">${d.lang}</div>
+      <div class="lb-bar-wrap">
+        <div class="lb-bar" style="width:0%;background:${d.color}" data-w="${d.pct}">
+          <span>${d.lang}</span>
+        </div>
+      </div>
+      <div class="lb-count">${fmtNum(d.count)}</div>
+    </div>`).join('');
+  setTimeout(()=>{
+    el.querySelectorAll('.lb-bar').forEach(b=>{b.style.width=b.dataset.w+'%'});
+  },200);
+}
+
+function animateCounters(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target=parseInt(el.dataset.count);
+    let cur=0;const step=Math.ceil(target/30);
+    const t=setInterval(()=>{
+      cur=Math.min(cur+step,target);
+      el.textContent=cur+(el.dataset.count>54?'K+':'')+' ';
+      if(cur>=target)clearInterval(t);
+    },40);
+  });
+}
+
+// ═══════════════════ RENDER: DEVS ═══════════════════
+function renderDevs(){
+  const country=document.getElementById('devCountry')?.value||'';
+  const search=(document.getElementById('devSearch')?.value||'').toLowerCase();
+  let data=[...DEVS];
+  if(country)data=data.filter(d=>d.country===country);
+  if(search)data=data.filter(d=>d.name.toLowerCase().includes(search)||d.login.toLowerCase().includes(search));
+  // Bio filters per tab
+  if(activeDevTab==='cofounders')data=data.filter(d=>detectBio(d.bio||'').isCo);
+  else if(activeDevTab==='hiring')data=data.filter(d=>detectBio(d.bio||'').isHiring);
+  else if(activeDevTab==='tech')data=data.filter(d=>d.top_language===activeTech||(d.bio||'').toLowerCase().includes(activeTech.toLowerCase()));
+  const grid=document.getElementById('devsGrid');
+  const meta=document.getElementById('devResultsMeta');
+  if(meta)meta.innerHTML=`Showing <strong>${data.length}</strong> developers${country?' in '+country:''}`;
+  if(grid)grid.innerHTML=data.length?data.map(devCardHTML).join(''):`<div class="empty-state"><div class="empty-state-icon">🌍</div><h3>No developers found</h3><p>Try adjusting your filters or search terms.</p></div>`;
+  // Bookmarks
+  renderBookmarksSection();
+}
+
+function switchDevTab(btn,tab){
+  activeDevTab=tab;
+  document.querySelectorAll('#page-developers .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const tw=document.getElementById('techPillsWrap');
+  if(tw)tw.style.display=tab==='tech'?'flex':'none';
+  renderDevs();
+}
+
+function selectTech(pill){
+  document.querySelectorAll('.tech-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  activeTech=pill.textContent.trim();
+  renderDevs();
+}
+
+// ═══════════════════ RENDER: REPOS ═══════════════════
+function renderRepos(){
+  const lang=document.getElementById('repoLang')?.value||'';
+  const country=document.getElementById('repoCountry')?.value||'';
+  let data=[...REPOS];
+  if(lang)data=data.filter(r=>r.language===lang);
+  const grid=document.getElementById('reposGrid');
+  const meta=document.getElementById('repoResultsMeta');
+  if(meta)meta.innerHTML=`Showing <strong>${data.length}</strong> repositories${lang?' in '+lang:''}`;
+  if(grid)grid.innerHTML=data.length?data.map(repoCardHTML).join(''):`<div class="empty-state"><div class="empty-state-icon">🚀</div><h3>No repos found</h3><p>Try selecting a different language filter.</p></div>`;
+}
+
+// ═══════════════════ RENDER: PROFILE ═══════════════════
+function renderProfile(){
+  // Heatmap
+  const hg=document.getElementById('heatmapGrid');
+  if(hg){
+    const levels=['','l1','l2','l3','l4'];
+    hg.innerHTML=Array.from({length:364},()=>{
+      const r=Math.random();
+      const l=r<.5?0:r<.7?1:r<.85?2:r<.95?3:4;
+      return`<div class="hmap-cell ${levels[l]}"></div>`;
+    }).join('');
+  }
+  // Profile repos
+  const pr=document.getElementById('profileRepos');
+  if(pr)pr.innerHTML=REPOS.slice(0,4).map(repoCardHTML).join('');
+  // Similar devs
+  const sd=document.getElementById('similarDevs');
+  if(sd)sd.innerHTML=DEVS.filter(d=>d.top_language==='TypeScript'&&d.login!=='kezmoselle').slice(0,3).map(devCardHTML).join('');
+}
+
+function toggleProfileBookmark(){
+  const btn=document.getElementById('profileBookmarkBtn');
+  const isSaved=bookmarks.includes('kezmoselle');
+  if(isSaved){bookmarks=bookmarks.filter(b=>b!=='kezmoselle');btn.textContent='☆ Bookmark';}
+  else{bookmarks.push('kezmoselle');btn.textContent='★ Bookmarked';}
+  showToast(isSaved?'Removed from bookmarks':'Bookmarked! ⭐');
+}
+
+// ═══════════════════ RENDER: ACTIVITY ═══════════════════
+let actFilter='all';
+function renderActivity(){
+  const feed=document.getElementById('activityFeed');
+  if(!feed)return;
+  let data=actFilter==='all'?ACTIVITIES:ACTIVITIES.filter(a=>{
+    if(actFilter==='push')return a.type==='PushEvent';
+    if(actFilter==='pr')return a.type==='PullRequestEvent';
+    if(actFilter==='star')return a.type==='WatchEvent';
+    if(actFilter==='fork')return a.type==='ForkEvent';
+    if(actFilter==='create')return a.type==='CreateEvent';
+    return true;
+  });
+  feed.innerHTML=data.map(actCardHTML).join('');
+  // Breakdown
+  const bd=document.getElementById('eventBreakdown');
+  if(bd){
+    const counts={};ACTIVITIES.forEach(a=>{counts[a.type]=(counts[a.type]||0)+1;});
+    bd.innerHTML=Object.entries(counts).map(([type,count])=>{
+      const cfg=EVENT_CONFIG[type]||{icon:'⚡',label:type};
+      const pct=Math.round(count/ACTIVITIES.length*100);
+      return`<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-size:.8rem">
+        <span style="width:20px">${cfg.icon}</span>
+        <div style="flex:1;height:6px;background:var(--bg-alt);border-radius:3px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--navy);border-radius:3px"></div>
+        </div>
+        <span class="text-muted mono">${count}</span>
+      </div>`;
+    }).join('');
+  }
+  // Most active
+  const ma=document.getElementById('mostActive');
+  if(ma){
+    const counts={};ACTIVITIES.forEach(a=>{
+      if(!counts[a.actor.login])counts[a.actor.login]={avatar:a.actor.avatar,count:0};
+      counts[a.actor.login].count++;
+    });
+    const sorted=Object.entries(counts).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
+    ma.innerHTML=sorted.map(([login,data])=>`
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;font-size:.8rem">
+        <div class="activity-avatar">${data.avatar}</div>
+        <span style="flex:1;cursor:pointer;color:var(--navy);font-weight:600" onclick="navigate('profile')">${login}</span>
+        <span class="mono text-muted">${data.count} events</span>
+      </div>`).join('');
+  }
+}
+function filterActivity(type,btn){
+  actFilter=type;
+  document.querySelectorAll('#page-activity .active-filter').forEach(b=>{b.classList.remove('active-filter');b.style.borderColor='';b.style.color='';});
+  btn.classList.add('active-filter');
+  btn.style.borderColor='var(--gold)';btn.style.color='var(--gold)';
+  renderActivity();
+}
+
+// ═══════════════════ RENDER: JOBS ═══════════════════
+function renderJobs(){
+  const grid=document.getElementById('jobsGrid');
+  if(!grid)return;
+  

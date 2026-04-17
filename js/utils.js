@@ -262,3 +262,92 @@ export function updateRateLimitBar() {
     : pct > 15 ? 'var(--color-accent)' : 'var(--color-danger)';
   if (label) label.textContent = `${remaining}/60 API calls`;
 }
+
+/**
+ * Display search history dropdown
+ * @param {HTMLElement} inputElement - The search input element
+ * @param {Function} onSelect - Function to call when a history item is selected
+ */
+export function displaySearchHistory(inputElement, onSelect) {
+  const history = getSearchHistory();
+  if (history.length === 0) return;
+
+  // Remove existing dropdown
+  const existing = document.querySelector('.search-history-dropdown');
+  if (existing) existing.remove();
+
+  // Create dropdown
+  const dropdown = document.createElement('div');
+  dropdown.className = 'search-history-dropdown';
+  dropdown.innerHTML = `
+    <div class="search-history-header">Recent Searches</div>
+    ${history.map(term => `
+      <div class="search-history-item" data-term="${sanitize(term)}">
+        <span class="search-history-icon"> clock </span>
+        <span class="search-history-text">${sanitize(term)}</span>
+        <button class="search-history-clear" data-term="${sanitize(term)}">clear</button>
+      </div>
+    `).join('')}
+    <div class="search-history-footer">
+      <button class="search-history-clear-all">Clear All</button>
+    </div>
+  `;
+
+  // Position dropdown
+  const rect = inputElement.getBoundingClientRect();
+  dropdown.style.position = 'absolute';
+  dropdown.style.top = `${rect.bottom + window.scrollY + 5}px`;
+  dropdown.style.left = `${rect.left + window.scrollX}px`;
+  dropdown.style.width = `${rect.width}px`;
+  dropdown.style.zIndex = '1000';
+
+  document.body.appendChild(dropdown);
+
+  // Handle clicks
+  dropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    const item = e.target.closest('.search-history-item');
+    if (item) {
+      const term = item.dataset.term;
+      onSelect(term);
+      dropdown.remove();
+    }
+    
+    const clearBtn = e.target.closest('.search-history-clear');
+    if (clearBtn) {
+      const term = clearBtn.dataset.term;
+      removeFromSearchHistory(term);
+      displaySearchHistory(inputElement, onSelect); // Refresh
+    }
+    
+    if (e.target.classList.contains('search-history-clear-all')) {
+      clearSearchHistory();
+      dropdown.remove();
+    }
+  });
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function closeDropdown() {
+      dropdown.remove();
+      document.removeEventListener('click', closeDropdown);
+    });
+  }, 0);
+}
+
+/**
+ * Remove item from search history
+ * @param {string} term - Term to remove
+ */
+export function removeFromSearchHistory(term) {
+  const history = getSearchHistory().filter(h => h !== term);
+  localStorage.setItem('afridev_search_history', JSON.stringify(history));
+}
+
+/**
+ * Clear all search history
+ */
+export function clearSearchHistory() {
+  localStorage.removeItem('afridev_search_history');
+}

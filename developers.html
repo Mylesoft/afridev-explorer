@@ -31,30 +31,29 @@
   <!-- Navbar -->
   <header class="site-header">
     <nav class="navbar">
-      <div class="container">
-        <div class="nav-brand">
-          <a href="index.html" class="logo">
-            <span class="logo-text">AfriDev</span>
-            <span class="logo-accent">Explorer</span>
-          </a>
-        </div>
-        
-        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
-          |||
-        </button>
-        
-        <div class="nav-links">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="developers.html" class="nav-link active" aria-current="page">Developers</a>
-          <a href="repositories.html" class="nav-link">Repositories</a>
-          <a href="activity.html" class="nav-link">Activity</a>
-          <a href="about.html" class="nav-link">About</a>
-                  </div>
-        
-        <div class="rate-limit-bar">
-          <div class="rate-limit-fill"></div>
-          <span class="rate-limit-label">60/60 API calls</span>
-        </div>
+      <div class="nav-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AfriDev</span>
+          <span class="logo-accent">Explorer</span>
+        </a>
+      </div>
+      
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        |||
+      </button>
+      
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="developers.html" class="nav-link active" aria-current="page">Developers</a>
+        <a href="repositories.html" class="nav-link">Repositories</a>
+        <a href="activity.html" class="nav-link">Activity</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="about.html" class="nav-link">About</a>
+              </div>
+      
+      <div class="rate-limit-bar">
+        <div class="rate-limit-fill"></div>
+        <span class="rate-limit-label">60/60 API calls</span>
       </div>
     </nav>
   </header>
@@ -177,23 +176,105 @@
 
         <!-- Technology Tab Filters -->
         <div id="filter-tech" class="filter-content" style="display: none;">
+          <div class="tech-pills-section">
+            <div class="tech-pills-header">
+              <h4>Languages</h4>
+            </div>
+            <div class="tech-pills">
+              <button class="tech-pill" data-tech="JavaScript" data-type="language">JavaScript</button>
+              <button class="tech-pill" data-tech="TypeScript" data-type="language">TypeScript</button>
+              <button class="tech-pill" data-tech="Python" data-type="language">Python</button>
+              <button class="tech-pill" data-tech="Java" data-type="language">Java</button>
+              <button class="tech-pill" data-tech="Go" data-type="language">Go</button>
+              <button class="tech-pill" data-tech="Rust" data-type="language">Rust</button>
+              <button class="tech-pill" data-tech="C++" data-type="language">C++</button>
+              <button class="tech-pill" data-tech="PHP" data-type="language">PHP</button>
+              <button class="tech-pill" data-tech="Ruby" data-type="language">Ruby</button>
+              <button class="tech-pill" data-tech="Swift" data-type="language">Swift</button>
+              <button class="tech-pill" data-tech="Kotlin" data-type="language">Kotlin</button>
+              <button class="tech-pill" data-tech="Dart" data-type="language">Dart</button>
+              <button class="tech-pill" data-tech="Shell" data-type="language">Shell</button>
+              <button class="tech-pill" data-tech="C#" data-type="language">C#</button>
+              <button class="tech-pill" data-tech="Elixir" data-type="language">Elixir</button>
+            </div>
+            
+            <div class="tech-pills-header">
+              <h4>Frameworks</h4>
+            </div>
+            <div class="tech-pills">
+              <button class="tech-pill" data-tech="React" data-type="framework">React</button>
+              <button class="tech-pill" data-tech="Vue" data-type="framework">Vue</button>
+              <button class="tech-pill" data-tech="Django" data-type="framework">Django</button>
+              <button class="tech-pill" data-tech="Laravel" data-type="framework">Laravel</button>
+              <button class="tech-pill" data-tech="Spring" data-type="framework">Spring</button>
+              <button class="tech-pill" data-tech="Flutter" data-type="framework">Flutter</button>
+              <button class="tech-pill" data-tech="Rails" data-type="framework">Rails</button>
+              <button class="tech-pill" data-tech="Next.js" data-type="framework">Next.js</button>
+              <button class="tech-pill" data-tech="Express" data-type="framework">Express</button>
+              <button class="tech-pill" data-tech="FastAPI" data-type="framework">FastAPI</button>
+              <button class="tech-pill" data-tech="Angular" data-type="framework">Angular</button>
+            </div>
+          </div>
+          
           <div class="filters-row">
             <div class="filter-group">
-              <label for="tech-select">Technology/Language</label>
-              <select id="tech-select" class="select-input">
-                <option value="">Select Technology</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="Java">Java</option>
-                <option value="Go">Go</option>
-                <option value="Rust">Rust</option>
-                <option value="C++">C++</option>
-                <option value="PHP">PHP</option>
-                <option value="Ruby">Ruby</option>
-                <option value="TypeScript">TypeScript</option>
-                <option value="Kotlin">Kotlin</option>
-                <option value="Scala">Scala</option>
-                <option value="R">R</option>
+              <label for="tech-country">Country</label>
+              <select id="tech-country" class="select-input">
+                <option value="">All Countries</option>
+                <option value="Algeria">Algeria</option>
+                <option value="Angola">Angola</option>
+                <option value="Benin">Benin</option>
+                <option value="Botswana">Botswana</option>
+                <option value="Burkina Faso">Burkina Faso</option>
+                <option value="Burundi">Burundi</option>
+                <option value="Cameroon">Cameroon</option>
+                <option value="Cape Verde">Cape Verde</option>
+                <option value="Central African Republic">Central African Republic</option>
+                <option value="Chad">Chad</option>
+                <option value="Comoros">Comoros</option>
+                <option value="Congo">Congo</option>
+                <option value="Democratic Republic of Congo">Democratic Republic of Congo</option>
+                <option value="Djibouti">Djibouti</option>
+                <option value="Egypt">Egypt</option>
+                <option value="Equatorial Guinea">Equatorial Guinea</option>
+                <option value="Eritrea">Eritrea</option>
+                <option value="Eswatini">Eswatini</option>
+                <option value="Ethiopia">Ethiopia</option>
+                <option value="Gabon">Gabon</option>
+                <option value="Gambia">Gambia</option>
+                <option value="Ghana">Ghana</option>
+                <option value="Guinea">Guinea</option>
+                <option value="Guinea-Bissau">Guinea-Bissau</option>
+                <option value="Ivory Coast">Ivory Coast</option>
+                <option value="Kenya">Kenya</option>
+                <option value="Lesotho">Lesotho</option>
+                <option value="Liberia">Liberia</option>
+                <option value="Libya">Libya</option>
+                <option value="Madagascar">Madagascar</option>
+                <option value="Malawi">Malawi</option>
+                <option value="Mali">Mali</option>
+                <option value="Mauritania">Mauritania</option>
+                <option value="Mauritius">Mauritius</option>
+                <option value="Morocco">Morocco</option>
+                <option value="Mozambique">Mozambique</option>
+                <option value="Namibia">Namibia</option>
+                <option value="Niger">Niger</option>
+                <option value="Nigeria">Nigeria</option>
+                <option value="Rwanda">Rwanda</option>
+                <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                <option value="Senegal">Senegal</option>
+                <option value="Seychelles">Seychelles</option>
+                <option value="Sierra Leone">Sierra Leone</option>
+                <option value="Somalia">Somalia</option>
+                <option value="South Africa">South Africa</option>
+                <option value="South Sudan">South Sudan</option>
+                <option value="Sudan">Sudan</option>
+                <option value="Tanzania">Tanzania</option>
+                <option value="Togo">Togo</option>
+                <option value="Tunisia">Tunisia</option>
+                <option value="Uganda">Uganda</option>
+                <option value="Zambia">Zambia</option>
+                <option value="Zimbabwe">Zimbabwe</option>
               </select>
             </div>
 

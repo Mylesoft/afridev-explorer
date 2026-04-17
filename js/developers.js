@@ -2,15 +2,16 @@
  * DEVELOPERS.JS - Developers Page Logic with Advanced Filters
  */
 
-import { searchUsers, searchDevelopersByTech, searchCofounders, searchJobSeekers } from './api.js';
-import { renderDevCard, renderErrorToast, renderPagination } from './render.js';
-import { debounce, getQueryParam, getMaxPages } from './utils.js';
+import { searchUsers, searchDevelopersByTech, searchCofounders, searchJobSeekers, searchByFramework } from './api.js';
+import { renderDevCard, renderErrorToast, renderPagination, attachCardActionHandlers } from './render.js';
+import { debounce, getQueryParam, getMaxPages, buildDateFilter } from './utils.js';
 
 let currentPage = 1;
 let currentCountry = '';
 let currentSearch = '';
 let currentFilter = 'search'; // 'search', 'tech', 'cofounders', 'jobs'
 let currentTech = '';
+let currentTechType = 'language'; // 'language' or 'framework'
 
 // Date filters
 let currentDateFrom = '';
@@ -75,63 +76,35 @@ async function loadDevelopers() {
   try {
     let result;
     
-    // Helper function to build date query
-    function buildDateQuery(dateFrom, dateTo) {
-      let dateQuery = '';
-      if (dateFrom) dateQuery += ` created:>=${dateFrom}`;
-      if (dateTo) dateQuery += ` created:<=${dateTo}`;
-      return dateQuery;
-    }
-    
     if (currentFilter === 'tech') {
-      // Search by technology with optional refining search
-      const dateQuery = buildDateQuery(currentTechDateFrom, currentTechDateTo);
-      const searchQuery = currentTechSearch ? currentTechSearch : (currentTech || query);
-      console.log(`Searching developers by tech: ${currentTech}, search: ${currentTechSearch}`);
-      result = await searchDevelopersByTech(
-        currentTech || searchQuery, 
-        techCountry?.value || '', 
-        currentPage, 
-        12,
-        dateQuery
-      );
+      // Search by technology
+      const dateQuery = buildDateFilter(currentTechDateFrom, currentTechDateTo);
+      const country = techCountry?.value || '';
+      
+      if (currentTechType === 'framework') {
+        result = await searchByFramework(currentTech, country, currentPage, 12);
+      } else {
+        result = await searchDevelopersByTech(currentTech, country, currentPage, 12, dateQuery);
+      }
     } else if (currentFilter === 'cofounders') {
-      // Search cofounders with optional refining search
-      const dateQuery = buildDateQuery(currentCofounderDateFrom, currentCofounderDateTo);
-      console.log(`Searching cofounders...`);
-      result = await searchCofounders(
-        cofoundersCountry?.value || '', 
-        currentPage, 
-        12,
-        dateQuery
-      );
+      // Search cofounders
+      const dateQuery = buildDateFilter(currentCofounderDateFrom, currentCofounderDateTo);
+      result = await searchCofounders(cofoundersCountry?.value || '', currentPage, 12, dateQuery);
     } else if (currentFilter === 'jobs') {
-      // Search job seekers with optional refining search
-      const dateQuery = buildDateQuery(currentJobDateFrom, currentJobDateTo);
-      console.log(`Searching job seekers...`);
-      result = await searchJobSeekers(
-        jobsCountry?.value || '', 
-        currentPage, 
-        12,
-        dateQuery
-      );
+      // Search job seekers
+      const dateQuery = buildDateFilter(currentJobDateFrom, currentJobDateTo);
+      result = await searchJobSeekers(jobsCountry?.value || '', currentPage, 12, dateQuery);
     } else {
       // Default search (username or location)
       const searchType = currentSearch ? 'username' : 'location';
-      const dateQuery = buildDateQuery(currentDateFrom, currentDateTo);
-      console.log(`Searching by ${searchType}: ${query}`);
-      result = await searchUsers(
-        query, 
-        currentPage, 
-        12, 
-        searchType,
-        dateQuery
-      );
+      const dateQuery = buildDateFilter(currentDateFrom, currentDateTo);
+      result = await searchUsers(query, currentPage, 12, searchType, dateQuery);
     }
     
-    console.log('Users found:', result);
-    
     grid.innerHTML = result.users.map(u => renderDevCard(u)).join('');
+    
+    // Attach card action handlers
+    attachCardActionHandlers(grid);
     
     resultCount.textContent = `${result.totalCount} developers found`;
     
@@ -141,18 +114,34 @@ async function loadDevelopers() {
       loadDevelopers();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    
-    // Add click handlers
-    document.querySelectorAll('.dev-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const username = card.querySelector('.username').textContent.replace('@', '');
-        window.location.href = `profile.html?user=${username}`;
-      });
-    });
   } catch (error) {
     console.error('Error loading developers:', error);
+    grid.innerHTML = '<p>Error loading developers. Please try again.</p>';
     renderErrorToast('Failed to load developers');
   }
+}
+
+// Tech pills functionality
+function setupTechPills() {
+  const techPills = document.querySelectorAll('.tech-pill');
+  
+  techPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      // Remove active class from all pills
+      techPills.forEach(p => p.classList.remove('active'));
+      
+      // Add active class to clicked pill
+      pill.classList.add('active');
+      
+      // Update current tech and type
+      currentTech = pill.dataset.tech;
+      currentTechType = pill.dataset.type;
+      
+      // Reset page and load results
+      currentPage = 1;
+      loadDevelopers();
+    });
+  });
 }
 
 // Filter tab switching
@@ -321,6 +310,45 @@ document.querySelector('.navbar-toggle')?.addEventListener('click', function() {
   this.setAttribute('aria-expanded', document.querySelector('.nav-links').classList.contains('open'));
 });
 
+// Event delegation for card clicks on developers page
+function setupDeveloperCardClickHandlers() {
+  const container = document.getElementById('developers-grid');
+  if (!container) return;
+  
+  container.addEventListener('click', (e) => {
+    // Check if click is on a developer card but not on a link/button
+    const card = e.target.closest('.dev-card');
+    if (!card) return;
+    
+    // Don't navigate if clicking on a link or button
+    if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('a') || e.target.closest('button')) {
+      return;
+    }
+    
+    // Get username from data attribute or subtitle
+    const username = card.dataset.username || card.querySelector('.card-subtitle')?.textContent?.replace('@', '');
+    if (username) {
+      window.location.href = `profile.html?user=${username}`;
+    }
+  });
+  
+  // Make cards visually clickable
+  const style = document.createElement('style');
+  style.textContent = `
+    .dev-card {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .dev-card:hover {
+      transform: translateY(-2px);
+    }
+    .dev-card .card-link {
+      cursor: pointer;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Initial load
 const searchParam = getQueryParam('search');
 const countryParam = getQueryParam('country');
@@ -340,3 +368,8 @@ if (searchParam) {
 }
 
 loadDevelopers();
+
+// Setup card click handlers after page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupDeveloperCardClickHandlers();
+});

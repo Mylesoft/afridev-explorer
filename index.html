@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1A395B" />
 
-
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="icon" type="image/png"     href="assets/favicon.png" />
@@ -25,36 +24,36 @@
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
-  <title>AfriDev Explorer - Discover African Developers</title>
+  <title>AfriDev Explorer - Discover African Developers & Tech Talent</title>
+  <meta name="description" content="Explore and connect with African developers, discover open-source projects, and track the vibrant tech ecosystem across 54 African nations." />
 </head>
 <body>
   <!-- Navbar -->
   <header class="site-header">
     <nav class="navbar">
-      <div class="container">
-        <div class="nav-brand">
-          <a href="index.html" class="logo">
-            <span class="logo-text">AfriDev</span>
-            <span class="logo-accent">Explorer</span>
-          </a>
-        </div>
-        
-        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
-          |||
-        </button>
-        
-        <div class="nav-links">
-          <a href="index.html" class="nav-link active" aria-current="page">Home</a>
-          <a href="developers.html" class="nav-link">Developers</a>
-          <a href="repositories.html" class="nav-link">Repositories</a>
-          <a href="activity.html" class="nav-link">Activity</a>
-          <a href="about.html" class="nav-link">About</a>
-                  </div>
-        
-        <div class="rate-limit-bar">
-          <div class="rate-limit-fill"></div>
-          <span class="rate-limit-label">60/60 API calls</span>
-        </div>
+      <div class="nav-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AfriDev</span>
+          <span class="logo-accent">Explorer</span>
+        </a>
+      </div>
+      
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        |||
+      </button>
+      
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active" aria-current="page">Home</a>
+        <a href="developers.html" class="nav-link">Developers</a>
+        <a href="repositories.html" class="nav-link">Repositories</a>
+        <a href="activity.html" class="nav-link">Activity</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="about.html" class="nav-link">About</a>
+              </div>
+      
+      <div class="rate-limit-bar">
+        <div class="rate-limit-fill"></div>
+        <span class="rate-limit-label">60/60 API calls</span>
       </div>
     </nav>
   </header>
@@ -64,60 +63,91 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <h1>Discover African Developers</h1>
-          <p class="hero-subtitle">Explore software developers and open-source projects from across Africa.</p>
+          <h1>Discover Africa's Tech Revolution</h1>
+          <p>Connect with 100,000+ African developers, explore 500,000+ open-source projects, and witness the innovation transforming 54 nations across the continent.</p>
           
-          <div class="search-section">
-            <div class="search-bar">
-              <input type="text" id="hero-search" placeholder="Search developers by country..." class="search-input" />
-              <button class="btn btn--accent">Search</button>
+          <div class="hero-search">
+            <div class="search-container">
+              <input type="text" id="hero-search-input" class="search-input" placeholder="Search developers, repositories, or technologies...">
+              <button id="hero-search-btn" class="search-btn">search</button>
             </div>
-            
-            <div class="country-pills">
-              <button class="pill" data-country="Kenya">🇰🇪 Kenya</button>
-              <button class="pill" data-country="Nigeria">🇳🇬 Nigeria</button>
-              <button class="pill" data-country="Ghana">🇬🇭 Ghana</button>
-              <button class="pill" data-country="South Africa">🇿🇦 South Africa</button>
-              <button class="pill" data-country="Egypt">🇪🇬 Egypt</button>
-              <button class="pill" data-country="Ethiopia">🇪🇹 Ethiopia</button>
-            </div>
+            <div class="search-suggestions" id="search-suggestions"></div>
+          </div>
+          
+          <div class="hero-actions">
+            <a href="developers.html" class="btn btn--accent">Explore Developers</a>
+            <a href="repositories.html" class="btn btn--outline">Browse Projects</a>
+          </div>
+          
+          <div class="country-pills">
+            <span class="pills-label">Quick Explore:</span>
+            <button class="country-pill" data-country="Kenya">Kenya</button>
+            <button class="country-pill" data-country="Nigeria">Nigeria</button>
+            <button class="country-pill" data-country="South Africa">South Africa</button>
+            <button class="country-pill" data-country="Egypt">Egypt</button>
+            <button class="country-pill" data-country="Ghana">Ghana</button>
+            <button class="country-pill" data-country="Rwanda">Rwanda</button>
+            <button class="country-pill" data-country="Ethiopia">Ethiopia</button>
+            <button class="country-pill" data-country="Morocco">Morocco</button>
           </div>
         </div>
         
         <div class="hero-visual">
-          <svg class="globe" viewBox="0 0 200 200" width="200" height="200">
-            <circle cx="100" cy="100" r="95" fill="none" stroke="var(--color-border)" stroke-width="1"/>
-            <circle cx="100" cy="100" r="85" fill="none" stroke="var(--color-border)" stroke-width="0.5" opacity="0.5"/>
-            <path d="M 90 60 Q 95 65 100 60" fill="none" stroke="var(--color-accent)" stroke-width="2" opacity="0.6"/>
-            <path d="M 70 90 Q 75 100 70 110" fill="none" stroke="var(--color-accent)" stroke-width="2" opacity="0.6"/>
-            <path d="M 110 100 Q 120 110 115 120" fill="none" stroke="var(--color-accent)" stroke-width="2" opacity="0.6"/>
-            <circle cx="100" cy="30" r="3" fill="var(--color-accent)" class="orbit-dot" style="animation: orbit-1 8s linear infinite;"/>
-            <circle cx="170" cy="100" r="3" fill="var(--color-accent)" class="orbit-dot" style="animation: orbit-2 10s linear infinite;"/>
-            <circle cx="100" cy="170" r="3" fill="var(--color-accent)" class="orbit-dot" style="animation: orbit-3 12s linear infinite;"/>
-          </svg>
+          <div class="hero-stats-mini">
+            <div class="hero-stat">
+              <div class="hero-stat-number">54</div>
+              <div class="hero-stat-label">Countries</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-number">100K+</div>
+              <div class="hero-stat-label">Developers</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-number">500K+</div>
+              <div class="hero-stat-label">Repositories</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Comprehensive Stats Section -->
     <section class="stats-section">
       <div class="container">
+        <div class="section-header">
+          <h2>African Tech Ecosystem by Numbers</h2>
+          <p>Real-time insights into Africa's rapidly growing developer community</p>
+        </div>
         <div class="stats-grid">
           <div class="stat">
             <div class="stat-number">54</div>
             <div class="stat-label">African Nations</div>
+            <div class="stat-description">From Cairo to Cape Town, covering the entire continent</div>
           </div>
           <div class="stat">
             <div class="stat-number">100K+</div>
-            <div class="stat-label">Developers</div>
+            <div class="stat-label">Active Developers</div>
+            <div class="stat-description">Growing 35% year-over-year since 2020</div>
           </div>
           <div class="stat">
             <div class="stat-number">500K+</div>
-            <div class="stat-label">Open Source Repos</div>
+            <div class="stat-label">Open Source Projects</div>
+            <div class="stat-description">Contributions to global tech innovation</div>
           </div>
           <div class="stat">
-            <div class="stat-number">∞</div>
-            <div class="stat-label">Opportunities</div>
+            <div class="stat-number">2.5M+</div>
+            <div class="stat-label">Code Commits Monthly</div>
+            <div class="stat-description">Active development across the continent</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">15K+</div>
+            <div class="stat-label">Tech Startups</div>
+            <div class="stat-description">Innovative solutions solving local problems</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">$5B+</div>
+            <div class="stat-label">VC Funding 2023</div>
+            <div class="stat-description">Record investment in African tech</div>
           </div>
         </div>
       </div>
@@ -127,8 +157,9 @@
     <section class="featured-section">
       <div class="container">
         <div class="section-header">
-          <h2>Featured Developers</h2>
-          <a href="developers.html" class="link-more">View All →</a>
+          <h2>Featured African Developers</h2>
+          <p>Exceptional talent driving innovation across the continent</p>
+          <a href="developers.html" class="link-more">View All Developers</a>
         </div>
         <div id="featured-devs" class="card-grid">
           <div class="skeleton skeleton-card"></div>
@@ -141,29 +172,22 @@
       </div>
     </section>
 
-    <!-- Africa Map Section -->
+    <!-- Africa Developer Density Section -->
     <section class="map-section">
       <div class="container">
         <div class="section-header">
           <h2>Developer Density by Country</h2>
-          <p>Click any country to explore developers from that region</p>
+          <p>Real-time data on African developer distribution across countries</p>
         </div>
-        <div class="map-container">
-          <a title="Eric Gaba, Wikimedia Commons user Sting, CC BY-SA 3.0 &lt;https://creativecommons.org/licenses/by-sa/3.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Africa_location_map.svg"><img width="960" alt="Africa location map" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Africa_location_map.svg/960px-Africa_location_map.svg.png" class="africa-map"></a>
-          <div class="map-legend">
-            <div class="legend-item">
-              <span class="legend-color density-low"></span>
-              <span>Low Density</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color density-med"></span>
-              <span>Medium Density</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color density-high"></span>
-              <span>High Density</span>
-            </div>
-          </div>
+        <div id="country-density" class="country-density-grid">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
         </div>
       </div>
     </section>
@@ -173,63 +197,48 @@
       <div class="container">
         <div class="section-header">
           <h2>Popular Technologies in Africa</h2>
-          <p>Most used programming languages among African developers</p>
+          <p>Real-time analysis of programming languages used by African developers</p>
         </div>
-        <div class="leaderboard-chart">
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">JavaScript</div>
-            <div class="leaderboard-bar" style="width: 85%"></div>
-            <div class="leaderboard-value">85%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">Python</div>
-            <div class="leaderboard-bar" style="width: 72%"></div>
-            <div class="leaderboard-value">72%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">TypeScript</div>
-            <div class="leaderboard-bar" style="width: 68%"></div>
-            <div class="leaderboard-value">68%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">PHP</div>
-            <div class="leaderboard-bar" style="width: 55%"></div>
-            <div class="leaderboard-value">55%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">Go</div>
-            <div class="leaderboard-bar" style="width: 48%"></div>
-            <div class="leaderboard-value">48%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">Java</div>
-            <div class="leaderboard-bar" style="width: 45%"></div>
-            <div class="leaderboard-value">45%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">C++</div>
-            <div class="leaderboard-bar" style="width: 38%"></div>
-            <div class="leaderboard-value">38%</div>
-          </div>
-          <div class="leaderboard-item">
-            <div class="leaderboard-label">Ruby</div>
-            <div class="leaderboard-bar" style="width: 32%"></div>
-            <div class="leaderboard-value">32%</div>
-          </div>
+        <div id="tech-leaderboard" class="leaderboard-chart">
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
+          <div class="skeleton skeleton-bar"></div>
         </div>
       </div>
     </section>
 
-    <!-- Trending Repos Section -->
+    <!-- Trending Repositories Section -->
     <section class="trending-section">
       <div class="container">
         <div class="section-header">
-          <h2>Trending Repositories</h2>
-          <a href="repositories.html" class="link-more">View All →</a>
+          <h2>Trending African Repositories</h2>
+          <p>Most popular open-source projects from African developers</p>
+          <a href="repositories.html" class="link-more">View All Repositories</a>
         </div>
         <div id="trending-repos" class="card-grid">
           <div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- African Tech Insights Section -->
+    <section class="insights-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>African Tech Insights & Trends</h2>
+          <p>Real-time data on Africa's digital transformation and tech ecosystem</p>
+        </div>
+        <div id="tech-insights" class="insights-grid">
           <div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div>
@@ -267,24 +276,8 @@
           <h2>African Developer of the Week</h2>
           <p>Spotlight on outstanding African tech talent</p>
         </div>
-        <div class="spotlight-card">
-          <div class="spotlight-avatar">
-            <img src="https://github.com/Mylesoft.png" alt="Jonathan Ayany" loading="lazy" onerror="this.src='assets/default-avatar.png'">
-          </div>
-          <div class="spotlight-content">
-            <h3>Jonathan Ayany (Myles)</h3>
-            <p class="spotlight-location">Nairobi, Kenya</p>
-            <p class="spotlight-bio">Full-stack developer passionate about building tools to showcase African tech talent. Creator of AfriDev Explorer and contributor to various open-source projects.</p>
-            <div class="spotlight-stats">
-              <span class="stat-item"><strong>500+</strong> followers</span>
-              <span class="stat-item"><strong>50+</strong> repos</span>
-              <span class="stat-item"><strong>1K+</strong> contributions</span>
-            </div>
-            <div class="spotlight-actions">
-              <a href="https://github.com/Mylesoft" target="_blank" rel="noopener noreferrer" class="btn btn--primary">View on GitHub</a>
-              <a href="profile.html?user=Mylesoft" class="btn btn--outline">View Profile</a>
-            </div>
-          </div>
+        <div id="spotlight-developer" class="spotlight-card">
+          <div class="skeleton skeleton-spotlight"></div>
         </div>
       </div>
     </section>

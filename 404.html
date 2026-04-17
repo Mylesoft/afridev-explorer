@@ -18,21 +18,35 @@
 <body>
   <header class="site-header">
     <nav class="navbar">
-      <a href="index.html" class="navbar-logo">AfriDev</a>
-      <button class="navbar-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AfriDev</span>
+          <span class="logo-accent">Explorer</span>
+        </a>
+      </div>
+      
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        |||
+      </button>
+      
       <div class="nav-links">
         <a href="index.html" class="nav-link">Home</a>
-        <a href="about.html" class="nav-link">About</a>
-        <a href="profile.html" class="nav-link">Profile</a>
         <a href="developers.html" class="nav-link">Developers</a>
         <a href="repositories.html" class="nav-link">Repositories</a>
+        <a href="activity.html" class="nav-link">Activity</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+      
+      <div class="rate-limit-bar">
+        <div class="rate-limit-fill"></div>
+        <span class="rate-limit-label">60/60 API calls</span>
       </div>
     </nav>
   </header>
 
   <main>
     <section class="error-section" style="min-height: 60vh; display: flex; align-items: center;">
-      <div class="container" style="text-align: center;">
+      <div style="text-align: center;">
         <h1 style="font-size: 6rem; color: var(--color-accent); margin: 0;">404</h1>
         <h2>Page Not Found</h2>
         <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">This page doesn't exist — yet. But there's plenty to explore!</p>

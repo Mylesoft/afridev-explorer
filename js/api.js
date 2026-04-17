@@ -11,13 +11,50 @@ const headers = GITHUB_TOKEN
   : { 'Accept': 'application/vnd.github.v3+json' };
 
 /**
+ * Retry function with exponential backoff
+ * @param {Function} fn - Function to retry
+ * @param {number} maxRetries - Maximum number of retries
+ * @param {number} delay - Initial delay in milliseconds
+ * @returns {Promise} - Result of the function
+ */
+export async function retryWithBackoff(fn, maxRetries = 3, delay = 1000) {
+  let lastError;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      // Don't retry on non-rate-limit errors
+      if (!error.message.includes('Rate limit') && !error.message.includes('403') && !error.message.includes('429')) {
+        throw error;
+      }
+      
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+      
+      // Exponential backoff with jitter
+      const backoffDelay = delay * Math.pow(2, i) + Math.random() * 1000;
+      console.log(`Rate limit hit, retrying in ${Math.round(backoffDelay)}ms (attempt ${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, backoffDelay));
+    }
+  }
+  
+  throw lastError;
+}
+
+/**
  * Handle API errors
  * @param {Response} response - The fetch response
  * @throws {Error} - Throws an error with a message
  */
 export function handleApiError(response) {
   if (response.status === 403 || response.status === 429) {
-    throw new Error('Rate limit exceeded. Please try again later.');
+    const rateLimitInfo = checkRateLimit(response.headers);
+    const resetTime = rateLimitInfo.reset ? new Date(rateLimitInfo.reset * 1000).toLocaleTimeString() : 'unknown';
+    throw new Error(`Rate limit exceeded. Resets at ${resetTime}. Please try again later.`);
   }
   if (response.status === 404) {
     throw new Error('Not found.');
@@ -66,7 +103,7 @@ export async function searchUsers(query, page = 1, perPage = 12, type = 'locatio
   
   const url = `${BASE_URL}/search/users?q=${searchQuery}&sort=followers&per_page=${perPage}&page=${page}`;
 
-  try {
+  return retryWithBackoff(async () => {
     const response = await fetch(url, { headers });
     handleApiError(response);
 
@@ -76,10 +113,7 @@ export async function searchUsers(query, page = 1, perPage = 12, type = 'locatio
       totalCount: data.total_count || 0,
       rateLimit: checkRateLimit(response.headers)
     };
-  } catch (error) {
-    console.error('Error searching users:', error);
-    throw error;
-  }
+  }, 3, 1000);
 }
 
 /**
@@ -90,7 +124,7 @@ export async function searchUsers(query, page = 1, perPage = 12, type = 'locatio
 export async function getUser(username) {
   const url = `${BASE_URL}/users/${encodeURIComponent(username)}`;
 
-  try {
+  return retryWithBackoff(async () => {
     const response = await fetch(url, { headers });
     handleApiError(response);
 
@@ -99,10 +133,7 @@ export async function getUser(username) {
       user: data,
       rateLimit: checkRateLimit(response.headers)
     };
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    throw error;
-  }
+  }, 3, 1000);
 }
 
 /**
@@ -115,7 +146,7 @@ export async function getUser(username) {
 export async function getUserRepos(username, sort = 'stars', perPage = 6) {
   const url = `${BASE_URL}/users/${encodeURIComponent(username)}/repos?sort=${sort}&per_page=${perPage}`;
 
-  try {
+  return retryWithBackoff(async () => {
     const response = await fetch(url, { headers });
     handleApiError(response);
 
@@ -124,10 +155,7 @@ export async function getUserRepos(username, sort = 'stars', perPage = 6) {
       repos: Array.isArray(data) ? data : [],
       rateLimit: checkRateLimit(response.headers)
     };
-  } catch (error) {
-    console.error('Error fetching user repos:', error);
-    throw error;
-  }
+  }, 3, 1000);
 }
 
 /**
@@ -145,7 +173,7 @@ export async function searchRepos(location = 'Africa', language = '', sort = 'st
 
   const url = `${BASE_URL}/search/repositories?q=${encodeURIComponent(query)}&sort=${sort}&per_page=${perPage}&page=${page}`;
 
-  try {
+  return retryWithBackoff(async () => {
     const response = await fetch(url, { headers });
     handleApiError(response);
 
@@ -155,10 +183,7 @@ export async function searchRepos(location = 'Africa', language = '', sort = 'st
       totalCount: data.total_count || 0,
       rateLimit: checkRateLimit(response.headers)
     };
-  } catch (error) {
-    console.error('Error searching repos:', error);
-    throw error;
-  }
+  }, 3, 1000);
 }
 
 /**
@@ -367,4 +392,139 @@ export async function getTrendingRepositories(language = '', page = 1, perPage =
     console.error('Error fetching trending repositories:', error);
     throw error;
   }
+}
+
+/**
+ * Get repository README content
+ * @param {string} owner - Repository owner username
+ * @param {string} repo - Repository name
+ * @returns {Promise<string>} - README content as plain text
+ */
+export async function getRepoReadme(owner, repo) {
+  const url = `${BASE_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/readme`;
+  
+  try {
+    const response = await fetch(url, { headers });
+    if (response.status === 404) {
+      return 'No README found for this repository.';
+    }
+    handleApiError(response);
+
+    const data = await response.json();
+    
+    // Decode base64 content
+    if (data.content) {
+      return atob(data.content.replace(/\n/g, ''));
+    }
+    
+    return 'README content could not be loaded.';
+  } catch (error) {
+    console.error('Error fetching README:', error);
+    return 'Failed to load README content.';
+  }
+}
+
+/**
+ * Search developers by framework (via repository topics)
+ * @param {string} framework - Framework name (e.g., 'React', 'Vue', 'Django')
+ * @param {string} location - Optional location filter
+ * @param {number} page - Page number
+ * @param {number} perPage - Results per page
+ * @returns {Promise<Object>} - Developers and rate limit info
+ */
+export async function searchByFramework(framework, location = '', page = 1, perPage = 12) {
+  let query = `topic:${encodeURIComponent(framework)}`;
+  if (location) {
+    query += ` location:${encodeURIComponent(location)}`;
+  }
+  
+  const url = `${BASE_URL}/search/repositories?q=${query}&sort=stars&per_page=${perPage}&page=${page}`;
+
+  try {
+    const response = await fetch(url, { headers });
+    handleApiError(response);
+
+    const data = await response.json();
+    
+    // Extract unique developers from repositories
+    const developerSet = new Set();
+    const developers = [];
+    
+    (data.items || []).forEach(repo => {
+      if (repo.owner && !developerSet.has(repo.owner.login)) {
+        developerSet.add(repo.owner.login);
+        developers.push(repo.owner);
+      }
+    });
+
+    return {
+      users: developers,
+      totalCount: data.total_count || 0,
+      rateLimit: checkRateLimit(response.headers)
+    };
+  } catch (error) {
+    console.error('Error searching by framework:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update rate limit display in navbar
+ */
+export function updateRateLimitDisplay() {
+  const rateLimitBar = document.querySelector('.rate-limit-fill');
+  const rateLimitLabel = document.querySelector('.rate-limit-label');
+  
+  if (window.__rateLimitInfo && rateLimitBar && rateLimitLabel) {
+    const { remaining, limit } = window.__rateLimitInfo;
+    const percentage = (remaining / limit) * 100;
+    
+    rateLimitBar.style.width = `${percentage}%`;
+    rateLimitLabel.textContent = `${remaining}/${limit} API calls`;
+    
+    // Color coding based on remaining requests
+    if (percentage > 40) {
+      rateLimitBar.style.background = 'var(--color-success)';
+    } else if (percentage > 15) {
+      rateLimitBar.style.background = 'var(--color-accent)';
+    } else {
+      rateLimitBar.style.background = 'var(--color-danger)';
+    }
+  }
+}
+
+/**
+ * Enhanced API fetch with rate limit tracking
+ * @param {string} endpoint - API endpoint
+ * @returns {Promise} - JSON response
+ */
+export async function apiFetchWithRateLimit(endpoint) {
+  const url = `${BASE_URL}${endpoint}`;
+  
+  return retryWithBackoff(async () => {
+    const response = await fetch(url, { headers });
+    
+    // Store rate limit information for UI display
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    const reset = response.headers.get('X-RateLimit-Reset');
+    const limit = response.headers.get('X-RateLimit-Limit');
+    
+    if (remaining && reset && limit) {
+      window.__rateLimitInfo = {
+        remaining: parseInt(remaining),
+        reset: parseInt(reset) * 1000, // Convert to milliseconds
+        limit: parseInt(limit),
+        resetTime: new Date(parseInt(reset) * 1000).toLocaleTimeString()
+      };
+      updateRateLimitDisplay();
+    }
+    
+    if (!response.ok) {
+      const error = new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+      error.status = response.status;
+      throw error;
+    }
+    
+    return response.json();
+  });
 }

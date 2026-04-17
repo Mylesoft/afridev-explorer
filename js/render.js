@@ -60,7 +60,8 @@ export function renderDevCard(user) {
           `).join('')}
         </div>
         <div class="card-tags">
-          <span>${user.company ? sanitize(user.company) : 'Individual Developer'}</span>
+          <span class="card-tag">JavaScript</span>
+          <span class="card-tag">Open Source</span>
         </div>
       </div>
       <div class="card-footer">
@@ -79,7 +80,7 @@ export function renderDevCard(user) {
 
 /**
  * Render a repository card
- * @param {Object} repo - Repository object from GitHub API
+ * @param {Object} repo - GitHub repository object
  * @returns {string} - HTML string for repo card
  */
 export function renderRepoCard(repo) {
@@ -92,8 +93,9 @@ export function renderRepoCard(repo) {
   const color = getLanguageColor(lang);
 
   const stats = [
-    { icon: 'star', value: formatNumber(repo.stargazers_count || 0) },
-    { icon: 'code-fork', value: formatNumber(repo.forks_count || 0) }
+    { label: 'Stars', value: formatNumber(repo.stargazers_count || 0) },
+    { label: 'Forks', value: formatNumber(repo.forks_count || 0) },
+    { label: 'Issues', value: formatNumber(repo.open_issues_count || 0) }
   ];
 
   return `
@@ -110,13 +112,21 @@ export function renderRepoCard(repo) {
       </div>
       <div class="card-content">
         <p class="card-description">${sanitize(repo.description || 'No description available')}</p>
-        <div class="card-language">
-          <span class="language-badge" style="background: ${color}">${sanitize(lang)}</span>
+        <div class="card-stats">
+          ${stats.map(s => `
+            <div class="card-stat">
+              <div class="card-stat-value">${s.value}</div>
+              <div class="card-stat-label">${s.label}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="card-tags">
+          ${lang ? `<span class="card-tag" style="background-color: ${color}; border-color: ${color};">${sanitize(lang)}</span>` : ''}
+          ${repo.topics ? repo.topics.slice(0, 3).map(topic => `<span class="card-tag">${sanitize(topic)}</span>`).join('') : ''}
         </div>
       </div>
       <div class="card-footer">
         <div class="card-meta">
-          ${stats.map(s => `<span class="material-icons">${s.icon}</span><span>${s.value}</span>`).join('')}
           <span>${timeAgo(repo.updated_at)}</span>
         </div>
         <div class="card-actions">
@@ -231,13 +241,16 @@ export function renderSpotlightDeveloper(user) {
 }
 
 /**
- * Render country density chart
- * @param {Array} countries - Array of country objects
- * @returns {string} - HTML string for country density section
+ * Render country density grid
+ * @param {Array} countries - Array of country data with developer counts
+ * @returns {string} - HTML string for country density grid
  */
 export function renderCountryDensity(countries) {
   return countries.map(country => `
     <article class="card country-card">
+      <div class="card-header">
+        <h3 class="card-title">${sanitize(country.name)}</h3>
+      </div>
       <div class="card-content">
         <div class="country-stats">
           <div class="country-stat">
@@ -246,7 +259,48 @@ export function renderCountryDensity(countries) {
           </div>
           <div class="country-percentage">${country.percentage || 0}%</div>
         </div>
-        <h3 class="card-title">${sanitize(country.name || 'Unknown')}</h3>
+      </div>
+      <div class="card-footer">
+        <a href="developers.html?country=${encodeURIComponent(country.name)}" class="card-link">Explore Developers</a>
+      </div>
+    </article>
+  `).join('');
+}
+
+/**
+ * Render tech leaderboard
+ * @param {Array} technologies - Array of technology data with usage percentages
+ * @returns {string} - HTML string for tech leaderboard
+ */
+export function renderTechLeaderboard(technologies) {
+  return technologies.map(tech => `
+    <div class="leaderboard-item">
+      <div class="leaderboard-label">${sanitize(tech.name)}</div>
+      <div class="leaderboard-bar">
+        <div class="leaderboard-fill" style="width: ${tech.percentage || 0}%"></div>
+      </div>
+      <div class="leaderboard-percentage">${tech.percentage || 0}%</div>
+    </div>
+  `).join('');
+}
+
+/**
+ * Render tech insights grid
+ * @param {Array} insights - Array of tech insight data
+ * @returns {string} - HTML string for tech insights grid
+ */
+export function renderTechInsights(insights) {
+  return insights.map(insight => `
+    <article class="insight-card">
+      <div class="insight-icon">
+        <span class="insight-icon-text">${sanitize(insight.icon)}</span>
+      </div>
+      <div class="insight-content">
+        <h3 class="insight-title">${sanitize(insight.title)}</h3>
+        <p class="insight-description">${sanitize(insight.description)}</p>
+        <div class="insight-stats">
+          ${insight.stats ? insight.stats.map(stat => `<div class="insight-stat">${sanitize(stat)}</div>`).join('') : ''}
+        </div>
       </div>
     </article>
   `).join('');
@@ -254,13 +308,13 @@ export function renderCountryDensity(countries) {
 
 /**
  * Render skeleton loading cards
- * @param {number} count - Number of skeleton cards to render
+ * @param {number} count - Number of skeletons to render
  * @returns {string} - HTML string for skeleton cards
  */
 export function renderSkeletonCards(count = 6) {
   return Array(count)
     .fill(0)
-    .map(() => '<div class="skeleton skeleton-card" aria-hidden="true"></div>')
+    .map(() => '<div class="skeleton skeleton-card"></div>')
     .join('');
 }
 
@@ -280,39 +334,10 @@ export function renderEmptyState(message = 'No results found', suggestions = [])
 }
 
 /**
- * Show a toast notification
- * @param {string} message - The message to display
- * @param {string} type - Type of toast: 'success', 'error', 'info'
- * @param {number} duration - Duration to show in ms
- * @returns {HTMLElement} - The toast element
- */
-export function showToast(message, type = 'info', duration = 5000) {
-  const container = document.getElementById('toast-container');
-  if (!container) {
-    return document.createElement('div');
-  }
-
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = sanitize(message);
-  toast.setAttribute('role', 'alert');
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-
-  return toast;
-}
-
-/**
- * Render error toast (legacy, uses showToast)
- * @param {string} message - The message to display
- * @param {string} type - The type of message
- * @param {number} duration - Duration to display
- * @returns {string} - HTML string for error toast
+ * Render error toast notification
+ * @param {string} message - Error message
+ * @param {string} type - Type: 'error', 'success', 'warning' (default 'error')
+ * @param {number} duration - Duration in ms (default 5000)
  */
 export function renderErrorToast(message, type = 'error', duration = 5000) {
   const container = document.getElementById('toast-container');
@@ -323,7 +348,7 @@ export function renderErrorToast(message, type = 'error', duration = 5000) {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.textContent = sanitize(message);
-  toast.setAttribute('role', 'alert');
+
   container.appendChild(toast);
 
   setTimeout(() => {
@@ -336,8 +361,8 @@ export function renderErrorToast(message, type = 'error', duration = 5000) {
 }
 
 /**
- * Render activity card
- * @param {Object} event - Activity event object
+ * Render an activity card
+ * @param {Object} event - GitHub event object
  * @returns {string} - HTML string for activity card
  */
 export function renderActivityCard(event) {
@@ -348,29 +373,57 @@ export function renderActivityCard(event) {
   
   return `
     <div class="activity-card">
-      <img src="${sanitize(actor.avatar_url || 'assets/default-avatar.png')}" alt="${sanitize(actor.login || 'User')}" class="activity-avatar" onerror="this.src='assets/default-avatar.png'">
-      <div class="activity-details">
-        <p class="activity-text">
-          <strong>${sanitize(actor.login || 'Unknown')}</strong>
-          ${eventType.toLowerCase().replace('event', '')} on
-          <strong>${sanitize(repo.name || 'Unknown repo')}</strong>
+      <div class="activity-header">
+        <img src="${sanitize(actor.avatar_url)}" alt="Avatar of ${sanitize(actor.login)}" onerror="this.src='assets/default-avatar.png'" class="activity-avatar" loading="lazy" />
+        <div class="activity-meta">
+          <a href="profile.html?user=${sanitize(actor.login)}" class="activity-user">${sanitize(actor.login)}</a>
+          <span class="activity-time">${timeAgo(event.created_at)}</span>
+        </div>
+        <span class="activity-type">${eventType}</span>
+      </div>
+      <div class="activity-content">
+        <p class="activity-description">
+          <span class="activity-user">${sanitize(actor.login)}</span> 
+          ${getActivityDescription(event)}
+          <a href="https://github.com/${sanitize(repo.name)}" class="activity-repo" target="_blank" rel="noopener noreferrer">${sanitize(repo.name)}</a>
         </p>
-        <p class="activity-time">${timeAgo(event.created_at || new Date().toISOString())}</p>
       </div>
     </div>
   `;
 }
 
 /**
+ * Get human-readable description for GitHub event type
+ * @param {Object} event - GitHub event object
+ * @returns {string} - Description of event
+ */
+function getActivityDescription(event) {
+  const descriptions = {
+    'PushEvent': 'pushed to',
+    'PullRequestEvent': 'opened a pull request in',
+    'IssuesEvent': 'opened an issue in',
+    'WatchEvent': 'starred',
+    'ForkEvent': 'forked',
+    'CreateEvent': 'created',
+    'ReleaseEvent': 'released a new version of'
+  };
+  
+  const action = descriptions[event.type] || 'performed an action in';
+  const repo = event.repo ? event.repo.name : 'a repository';
+  
+  return `${action} ${repo}`;
+}
+
+/**
  * Render pagination controls
  * @param {number} currentPage - Current page number
  * @param {number} totalPages - Total number of pages
- * @param {Function} onPageChange - Callback when page changes
- * @returns {string} - HTML string for pagination
+ * @param {Function} onPageChange - Callback for page change
+ * @returns {string} - HTML for pagination
  */
 export function renderPagination(currentPage, totalPages, onPageChange) {
   if (totalPages <= 1) return '';
-  
+
   let pagination = '<div class="pagination">';
   
   // Previous button
@@ -444,18 +497,13 @@ export function attachCardActionHandlers(container = document.querySelector('.ca
       toggleBookmark(username);
       
       // Update button state
-      bookmarkBtn.classList.toggle('bookmarked');
-      const isNowBookmarked = bookmarkBtn.classList.contains('bookmarked');
-      bookmarkBtn.textContent = isNowBookmarked ? 'star' : 'star_border';
-      bookmarkBtn.setAttribute('aria-label', isNowBookmarked ? 'Remove bookmark' : 'Add bookmark');
-      
-      showToast(
-        isNowBookmarked ? 'Profile saved to bookmarks.' : 'Profile removed from bookmarks.',
-        'success'
-      );
+      const isBookmarkedState = isBookmarked(username);
+      bookmarkBtn.classList.toggle('bookmarked', isBookmarkedState);
+      bookmarkBtn.textContent = isBookmarkedState ? 'star' : 'star_border';
       return;
     }
 
+    // Share buttons
     const shareBtn = e.target.closest('.share-btn');
     if (shareBtn) {
       e.preventDefault();
@@ -473,4 +521,42 @@ export function attachCardActionHandlers(container = document.querySelector('.ca
       return;
     }
   });
+}
+
+/**
+ * Show toast notification
+ * @param {string} message - Toast message
+ * @param {string} type - Toast type: 'success', 'error', 'info'
+ */
+export function showToast(message, type = 'info') {
+  // Remove existing toast
+  const existingToast = document.querySelector('.toast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.setAttribute('role', 'alert');
+  toast.innerHTML = `
+    <span class="toast-message">${sanitize(message)}</span>
+    <button class="toast-close" aria-label="Close notification">close</button>
+  `;
+
+  // Add to DOM
+  document.body.appendChild(toast);
+
+  // Handle close button
+  const closeBtn = toast.querySelector('.toast-close');
+  closeBtn.addEventListener('click', () => {
+    toast.remove();
+  });
+
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.remove();
+    }
+  }, 5000);
 }

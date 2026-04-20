@@ -21,24 +21,19 @@ import {
 export function renderDevCard(user) {
   user = user || {};
   const login = user.login || 'unknown-user';
+  const displayName = user.name || login;
   const avatarUrl = user.avatar_url || 'assets/default-avatar.png';
   const repositoriesUrl = `repositories.html?owner=${encodeURIComponent(login)}`;
-
-  const stats = [
-    { label: 'Followers', value: formatNumber(user.followers || 0) },
-    { label: 'Repos', value: formatNumber(user.public_repos || 0) },
-    { label: 'Following', value: formatNumber(user.following || 0) }
-  ];
-
   const bookmarked = isBookmarked(login);
 
   return `
     <article class="card dev-card" data-username="${sanitize(login)}">
       <div class="card-header">
-        <img src="${sanitize(avatarUrl)}" alt="${sanitize(user.name || login)}" class="card-avatar" loading="lazy" onerror="this.src='assets/default-avatar.png'">
-        <div>
-          <h3 class="card-title">${sanitize(user.name || login)}</h3>
+        <img src="${sanitize(avatarUrl)}" alt="${sanitize(displayName)}" class="card-avatar" loading="lazy" onerror="this.src='assets/default-avatar.png'">
+        <div class="card-info">
+          <h3 class="card-title">${sanitize(displayName)}</h3>
           <p class="card-subtitle">@${sanitize(login)}</p>
+          <p class="card-location">${user.location ? sanitize(user.location) : 'Location not specified'}</p>
         </div>
         <div class="card-bookmarks">
           <button class="bookmark-btn ${bookmarked ? 'bookmarked' : ''}" data-username="${sanitize(login)}" aria-label="${bookmarked ? 'Remove bookmark' : 'Add bookmark'}">
@@ -52,26 +47,25 @@ export function renderDevCard(user) {
       <div class="card-content">
         <p class="card-description">${sanitize(user.bio || 'Passionate developer contributing to the African tech ecosystem.')}</p>
         <div class="card-stats">
-          ${stats.map(s => `
-            <div class="card-stat">
-              <div class="card-stat-value">${s.value}</div>
-              <div class="card-stat-label">${s.label}</div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="card-tags">
-          <span class="card-tag">JavaScript</span>
-          <span class="card-tag">Open Source</span>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(user.followers || 0)}</div>
+            <div class="card-stat-label">Followers</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(user.public_repos || 0)}</div>
+            <div class="card-stat-label">Repositories</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(user.following || 0)}</div>
+            <div class="card-stat-label">Following</div>
+          </div>
         </div>
       </div>
       <div class="card-footer">
-        <div class="card-meta">
-          <span>${user.location ? sanitize(user.location) : 'Location not specified'}</span>
-        </div>
         <div class="card-actions">
-          <a href="profile.html?user=${sanitize(login)}" class="card-link view-profile-btn">View Profile</a>
-          <a href="${sanitize(repositoriesUrl)}" class="card-link">View Repositories</a>
-          <a href="${sanitize(user.html_url || '#')}" target="_blank" rel="noopener noreferrer" class="card-link">GitHub</a>
+          <a href="profile.html?user=${sanitize(login)}" class="card-btn card-btn--primary">View Profile</a>
+          <a href="${sanitize(repositoriesUrl)}" class="card-btn card-btn--secondary">Repositories</a>
+          <a href="${sanitize(user.html_url || '#')}" target="_blank" rel="noopener noreferrer" class="card-btn card-btn--outline">GitHub</a>
         </div>
       </div>
     </article>
@@ -89,22 +83,18 @@ export function renderRepoCard(repo) {
   const ownerLogin = owner.login || '';
   const repoName = repo.name || '';
   const repoUrl = repo.html_url || (ownerLogin && repoName ? `https://github.com/${ownerLogin}/${repoName}` : '#');
+  const profileUrl = `profile.html?user=${encodeURIComponent(ownerLogin)}`;
   const lang = repo.language || 'Other';
   const color = getLanguageColor(lang);
-
-  const stats = [
-    { label: 'Stars', value: formatNumber(repo.stargazers_count || 0) },
-    { label: 'Forks', value: formatNumber(repo.forks_count || 0) },
-    { label: 'Issues', value: formatNumber(repo.open_issues_count || 0) }
-  ];
 
   return `
     <article class="card repo-card" data-owner="${sanitize(ownerLogin)}" data-repo="${sanitize(repoName)}">
       <div class="card-header">
         <img src="${sanitize(owner.avatar_url || 'assets/default-avatar.png')}" alt="${sanitize(ownerLogin || 'Repository owner')}" class="card-avatar" loading="lazy" onerror="this.src='assets/default-avatar.png'">
-        <div>
+        <div class="card-info">
           <h3 class="card-title">${sanitize(repoName || 'Untitled repository')}</h3>
-          <p class="card-subtitle">${sanitize(ownerLogin || 'Unknown owner')}</p>
+          <p class="card-subtitle">by ${sanitize(ownerLogin || 'Unknown owner')}</p>
+          <p class="card-language">${lang ? `<span class="language-dot" style="background-color: ${color}"></span>${sanitize(lang)}` : 'No language specified'}</p>
         </div>
         <div class="card-actions">
           <button class="readme-btn" data-owner="${sanitize(ownerLogin)}" data-repo="${sanitize(repoName)}">README</button>
@@ -113,24 +103,31 @@ export function renderRepoCard(repo) {
       <div class="card-content">
         <p class="card-description">${sanitize(repo.description || 'No description available')}</p>
         <div class="card-stats">
-          ${stats.map(s => `
-            <div class="card-stat">
-              <div class="card-stat-value">${s.value}</div>
-              <div class="card-stat-label">${s.label}</div>
-            </div>
-          `).join('')}
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(repo.stargazers_count || 0)}</div>
+            <div class="card-stat-label">Stars</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(repo.forks_count || 0)}</div>
+            <div class="card-stat-label">Forks</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(repo.open_issues_count || 0)}</div>
+            <div class="card-stat-label">Issues</div>
+          </div>
         </div>
         <div class="card-tags">
-          ${lang ? `<span class="card-tag" style="background-color: ${color}; border-color: ${color};">${sanitize(lang)}</span>` : ''}
           ${repo.topics ? repo.topics.slice(0, 3).map(topic => `<span class="card-tag">${sanitize(topic)}</span>`).join('') : ''}
         </div>
       </div>
       <div class="card-footer">
         <div class="card-meta">
-          <span>${timeAgo(repo.updated_at)}</span>
+          <span>Updated ${timeAgo(repo.updated_at)}</span>
         </div>
         <div class="card-actions">
-          <a href="${sanitize(repoUrl)}" target="_blank" rel="noopener noreferrer" class="card-link">View Repository</a>
+          <a href="${sanitize(profileUrl)}" class="card-btn card-btn--primary">View Profile</a>
+          <a href="${sanitize(repoUrl)}" target="_blank" rel="noopener noreferrer" class="card-btn card-btn--secondary">Repository</a>
+          <a href="${sanitize(repoUrl)}" target="_blank" rel="noopener noreferrer" class="card-btn card-btn--outline">GitHub</a>
         </div>
       </div>
     </article>
@@ -212,31 +209,68 @@ export function renderProfileHeader(user = {}) {
  * @returns {string} - HTML string for spotlight card
  */
 export function renderSpotlightDeveloper(user) {
-  user = user || {};
-  const login = user.login || 'unknown-user';
+  const spotlight = user || {};
+  const profile = spotlight.user || spotlight;
+  const repos = spotlight.repos || [];
+  const featuredRepo = spotlight.featuredRepo || repos[0] || null;
+  const login = profile.login || 'unknown-user';
+  const displayName = profile.name || login;
   const repositoriesUrl = `repositories.html?owner=${encodeURIComponent(login)}`;
+  const bookmarked = isBookmarked(login);
+
   return `
-    <div class="spotlight-card">
-      <div class="spotlight-avatar">
-        <img src="${sanitize(user.avatar_url || 'assets/default-avatar.png')}" alt="${sanitize(user.name || user.login || 'Developer')}" onerror="this.src='assets/default-avatar.png'">
-      </div>
-      <div class="spotlight-info">
-        <h3 class="spotlight-name">${sanitize(user.name || login || 'Unknown developer')}</h3>
-        <p class="spotlight-username">@${sanitize(login)}</p>
-        <p class="spotlight-bio">${sanitize(user.bio || 'Passionate developer contributing to African tech ecosystem.')}</p>
-        <p class="spotlight-location">${sanitize(user.location || 'Location not specified')}</p>
-        <div class="spotlight-stats">
-          <span class="spotlight-stat">${formatNumber(user.followers || 0)} followers</span>
-          <span class="spotlight-stat">${formatNumber(user.public_repos || 0)} repos</span>
-          <span class="spotlight-stat">${formatNumber(user.following || 0)} following</span>
+    <article class="card dev-card" data-username="${sanitize(login)}">
+      <div class="card-header">
+        <img src="${sanitize(profile.avatar_url || 'assets/default-avatar.png')}" alt="${sanitize(displayName)}" class="card-avatar" loading="lazy" onerror="this.src='assets/default-avatar.png'">
+        <div class="card-info">
+          <div class="spotlight-badge">Developer Of The Week</div>
+          <h3 class="card-title">${sanitize(displayName)}</h3>
+          <p class="card-subtitle">@${sanitize(login)}</p>
+          <p class="card-location">${profile.location ? sanitize(profile.location) : 'Location not specified'}</p>
         </div>
-        <div class="spotlight-actions">
-          <a href="profile.html?user=${sanitize(login)}" class="spotlight-link">View Profile</a>
-          <a href="${sanitize(repositoriesUrl)}" class="spotlight-link">View Repositories</a>
-          <a href="${sanitize(user.html_url || '#')}" target="_blank" rel="noopener noreferrer" class="spotlight-link">GitHub</a>
+        <div class="card-bookmarks">
+          <button class="bookmark-btn ${bookmarked ? 'bookmarked' : ''}" data-username="${sanitize(login)}" aria-label="${bookmarked ? 'Remove bookmark' : 'Add bookmark'}">
+            ${bookmarked ? 'star' : 'star_border'}
+          </button>
+          <button class="share-btn" data-username="${sanitize(login)}" aria-label="Share profile">
+            share
+          </button>
         </div>
       </div>
-    </div>
+      <div class="card-content">
+        <p class="card-description">${sanitize(profile.bio || 'Passionate developer contributing to the African tech ecosystem.')}</p>
+        <div class="card-stats">
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(profile.followers || 0)}</div>
+            <div class="card-stat-label">Followers</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${formatNumber(profile.public_repos || 0)}</div>
+            <div class="card-stat-label">Repositories</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-value">${featuredRepo ? formatNumber(featuredRepo.stargazers_count || 0) : '0'}</div>
+            <div class="card-stat-label">Top Repo Stars</div>
+          </div>
+        </div>
+        ${featuredRepo ? `
+        <div class="card-tags">
+          <span class="card-tag card-tag--featured">Featured: ${sanitize(featuredRepo.name)}</span>
+          ${repos.slice(0, 2).map(repo => `<span class="card-tag">${sanitize(repo.name)}</span>`).join('')}
+        </div>
+        ` : ''}
+      </div>
+      <div class="card-footer">
+        <div class="card-meta">
+          <span>${featuredRepo ? `Featured Repo: ${sanitize(featuredRepo.name)}` : 'No featured repository'}</span>
+        </div>
+        <div class="card-actions">
+          <a href="profile.html?user=${sanitize(login)}" class="card-btn card-btn--primary">View Profile</a>
+          <a href="${sanitize(repositoriesUrl)}" class="card-btn card-btn--secondary">Repositories</a>
+          <a href="${sanitize(profile.html_url || '#')}" target="_blank" rel="noopener noreferrer" class="card-btn card-btn--outline">GitHub</a>
+        </div>
+      </div>
+    </article>
   `;
 }
 
@@ -249,7 +283,10 @@ export function renderCountryDensity(countries) {
   return countries.map(country => `
     <article class="card country-card">
       <div class="card-header">
-        <h3 class="card-title">${sanitize(country.name)}</h3>
+        <div class="country-card__heading">
+          <h3 class="card-title">${sanitize(country.name)}</h3>
+          <span class="country-rank">#${sanitize(String(country.rank || ''))}</span>
+        </div>
       </div>
       <div class="card-content">
         <div class="country-stats">
@@ -257,7 +294,14 @@ export function renderCountryDensity(countries) {
             <div class="country-stat-value">${formatNumber(country.developerCount || country.count || 0)}</div>
             <div class="country-stat-label">Developers</div>
           </div>
-          <div class="country-percentage">${country.percentage || 0}%</div>
+          <div class="country-percentage">${Math.round(country.percentage || 0)}%</div>
+        </div>
+        <div class="country-density-meter" aria-hidden="true">
+          <div class="country-density-meter__fill" style="width:${Math.max(8, Math.round(country.percentage || 0))}%"></div>
+        </div>
+        <div class="country-card__meta">
+          <span>${formatNumber(country.repositories || 0)} repos sampled</span>
+          <span>${formatNumber(country.followers || 0)} combined followers</span>
         </div>
       </div>
       <div class="card-footer">
@@ -277,7 +321,7 @@ export function renderTechLeaderboard(technologies) {
     <div class="leaderboard-item">
       <div class="leaderboard-label">${sanitize(tech.name)}</div>
       <div class="leaderboard-bar">
-        <div class="leaderboard-fill" style="width: ${tech.percentage || 0}%"></div>
+        <div class="leaderboard-fill" style="width: ${Math.max(12, tech.percentage || 0)}%"></div>
       </div>
       <div class="leaderboard-percentage">${tech.percentage || 0}%</div>
     </div>
@@ -293,7 +337,7 @@ export function renderTechInsights(insights) {
   return insights.map(insight => `
     <article class="insight-card">
       <div class="insight-icon">
-        <span class="insight-icon-text">${sanitize(insight.icon)}</span>
+        ${insight.icon || ''}
       </div>
       <div class="insight-content">
         <h3 class="insight-title">${sanitize(insight.title)}</h3>
@@ -371,6 +415,18 @@ export function renderActivityCard(event) {
   const actor = event.actor || {};
   const repo = event.repo || {};
   
+  const eventIcons = {
+    'PushEvent': 'push',
+    'PullRequestEvent': 'pull-request',
+    'IssuesEvent': 'issue',
+    'WatchEvent': 'star',
+    'ForkEvent': 'fork',
+    'CreateEvent': 'create',
+    'ReleaseEvent': 'release'
+  };
+  
+  const iconClass = eventIcons[eventType] || 'activity';
+  
   return `
     <div class="activity-card">
       <div class="activity-header">
@@ -379,7 +435,10 @@ export function renderActivityCard(event) {
           <a href="profile.html?user=${sanitize(actor.login)}" class="activity-user">${sanitize(actor.login)}</a>
           <span class="activity-time">${timeAgo(event.created_at)}</span>
         </div>
-        <span class="activity-type">${eventType}</span>
+        <div class="activity-type">
+          <span class="activity-icon activity-icon--${iconClass}"></span>
+          <span class="activity-label">${eventType}</span>
+        </div>
       </div>
       <div class="activity-content">
         <p class="activity-description">

@@ -8,6 +8,7 @@
   --color-primary-light: #2A5080;  /* Light Navy */
   --color-accent:       #C79639;  /* Gold - action colour */
   --color-accent-light: #E0B860;  /* Light Gold */
+  --color-accent-dark:  #9D7326;  /* Deep Gold */
   --color-white:        #FFFFFF;  /* White - base surface */
 
   /* Derived Colours */
@@ -17,9 +18,11 @@
   --color-surface-alt:  #F9FAFB;  /* Alternative surface */
   --color-text:         #1E293B;  /* Near-black (derived) */
   --color-text-muted:   #64748B;  /* Muted (derived) */
+  --color-text-secondary: #475569;
   --color-text-light:   #94A3B8;  /* Light text */
   --color-border:       #E2E8F0;  /* Border (derived) */
   --color-border-light: #F1F5F9;  /* Light border */
+  --color-background-light: #F8FAFC;
   
   /* Premium Gradients */
   --gradient-primary:   linear-gradient(135deg, #1A395B 0%, #2A5080 100%);
@@ -91,4 +94,38 @@
   --radius-xl:   0.75rem;   /* 12px */
   --radius-2xl:  1rem;      /* 16px */
   --radius-full: 9999px;
+}
+
+[data-theme="dark"] {
+  --color-primary: #DCE7F7;
+  --color-primary-light: #8CB4E6;
+  --color-accent: #D8A84A;
+  --color-accent-light: #F2C979;
+  --color-accent-dark: #A57824;
+  --color-white: #FFFFFF;
+
+  --color-bg: #08111f;
+  --color-bg-alt: #101b2f;
+  --color-surface: #0f172a;
+  --color-surface-alt: #162238;
+  --color-text: #E2E8F0;
+  --color-text-muted: #94A3B8;
+  --color-text-secondary: #CBD5E1;
+  --color-text-light: #64748B;
+  --color-border: #22324c;
+  --color-border-light: #172338;
+  --color-background-light: #111B2D;
+
+  --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  --gradient-accent: linear-gradient(135deg, #C79639 0%, #E6BC66 100%);
+  --gradient-surface: linear-gradient(135deg, #0f172a 0%, #162238 100%);
+  --gradient-hero: linear-gradient(135deg, #08111f 0%, #132746 58%, #9D7326 100%);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.38), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 18px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 18px 36px rgba(0, 0, 0, 0.34);
+  --shadow-2xl: 0 26px 56px rgba(0, 0, 0, 0.4);
+  --shadow-accent: 0 6px 22px rgba(216, 168, 74, 0.22);
 }

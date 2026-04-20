@@ -4,6 +4,7 @@
 
 import { getUser, getUserRepos, searchUsers } from './api.js';
 import { renderProfileHeader, renderRepoCard, renderErrorToast, renderDevCard, attachCardActionHandlers, showToast } from './render.js';
+import { bindReadmePreviewHandlers } from './repositories.js';
 import { getQueryParam, toggleBookmark, copyProfileLink } from './utils.js';
 
 const username = getQueryParam('user');
@@ -36,6 +37,7 @@ async function loadProfile() {
 
     attachCardActionHandlers(profileReposGrid);
     attachCardActionHandlers(similarDevelopersGrid);
+    bindReadmePreviewHandlers(profileReposGrid);
   } catch (error) {
     console.error('Error loading profile:', error);
     notFound.style.display = 'block';
@@ -49,68 +51,16 @@ async function loadContributionHeatmap(username) {
     console.error('Heatmap container not found');
     return;
   }
-  
-  heatmapContainer.innerHTML = '<div class="heatmap-loading">Loading contribution data...</div>';
-  
-  try {
-    // Mock contribution data (in real implementation, this would come from GitHub API)
-    const contributions = generateMockContributions();
-    renderContributionHeatmap(contributions);
-  } catch (error) {
-    heatmapContainer.innerHTML = '<p>Failed to load contribution data.</p>';
-  }
-}
 
-// Generate mock contribution data
-function generateMockContributions() {
-  const contributions = [];
-  const today = new Date();
-  
-  for (let i = 364; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    
-    const level = Math.floor(Math.random() * 8);
-    contributions.push({
-      date: date.toISOString().split('T')[0],
-      count: level,
-      level: level
-    });
-  }
-  
-  return contributions;
-}
-
-// Render contribution heatmap
-function renderContributionHeatmap(contributions) {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-  let html = '<div class="contribution-graph">';
-  
-  for (let week = 0; week < 53; week++) {
-    for (let day = 0; day < 7; day++) {
-      const index = week * 7 + day;
-      if (index < contributions.length) {
-        const contrib = contributions[index];
-        const date = new Date(contrib.date);
-        const dayName = days[date.getDay()];
-        const monthName = months[date.getMonth()];
-        const dayNum = date.getDate();
-        
-        html += `
-          <div class="contribution-day" data-level="${contrib.level}" title="${monthName} ${dayNum}, ${dayName} - ${contrib.count} contributions">
-            <div class="contribution-level-${contrib.level}"></div>
-          </div>
-        `;
-      } else {
-        html += '<div class="contribution-day"></div>';
-      }
-    }
-  }
-  
-  html += '</div>';
-  heatmapContainer.innerHTML = html;
+  heatmapContainer.innerHTML = `
+    <img
+      class="heatmap-image"
+      src="https://ghchart.rshah.org/C79639/${encodeURIComponent(username)}"
+      alt="${username}'s contribution heatmap"
+      loading="lazy"
+    >
+    <p class="heatmap-note">Contribution history powered by public GitHub data.</p>
+  `;
 }
 
 // Load similar developers

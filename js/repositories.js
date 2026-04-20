@@ -4,15 +4,20 @@
 
 import { searchRepos, getRepoReadme, getUserRepos } from './api.js';
 import { renderRepoCard, renderErrorToast, renderPagination, attachCardActionHandlers } from './render.js';
-import { getMaxPages, sanitize, getQueryParam } from './utils.js';
+import { getMaxPages, getQueryParam } from './utils.js';
 
 let currentPage = 1;
 let currentLanguage = '';
 let currentOwner = '';
 let languagePills, sortSelect, grid, pagination, resultCount, emptyState;
 let pageTitle, pageDescription, emptyStateLink;
+let readmePreviewBound = false;
 
 async function loadRepos() {
+  if (!grid || !pagination || !resultCount) {
+    return;
+  }
+
   grid.innerHTML = '<div class="skeleton skeleton-card"></div>'.repeat(6);
   if (emptyState) {
     emptyState.style.display = 'none';
@@ -50,20 +55,7 @@ async function loadRepos() {
 
     grid.innerHTML = repos.map(r => renderRepoCard(r)).join('');
     
-    // Add README hover preview functionality
-    const repoCards = grid.querySelectorAll('.repo-card');
-    repoCards.forEach(card => {
-      const readmeBtn = card.querySelector('.readme-btn');
-      if (readmeBtn) {
-        readmeBtn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const owner = card.dataset.owner;
-          const repo = card.dataset.repo;
-          await showReadmePreview(owner, repo);
-        });
-      }
-    });
+    bindReadmePreviewHandlers(grid);
     
     resultCount.textContent = currentOwner
       ? `${totalCount} repositories found for ${currentOwner}`
@@ -120,46 +112,83 @@ function updateRepositoryViewCopy() {
 }
 
 // Show README preview modal
-async function showReadmePreview(owner, repo) {
+export async function showReadmePreview(owner, repo) {
   const preview = document.getElementById('readme-preview');
   const title = document.getElementById('readme-title');
   const body = document.getElementById('readme-body');
   const closeBtn = document.querySelector('.readme-close');
+  if (!preview || !title || !body || !closeBtn) {
+    return;
+  }
   
   // Show preview
   preview.classList.add('active');
   title.textContent = `${owner}/${repo} README`;
-  body.innerHTML = '<div class="skeleton skeleton-card"></div>';
+  body.textContent = 'Loading README...';
   
   try {
     const readme = await getRepoReadme(owner, repo);
-    body.innerHTML = sanitize(readme);
+    body.textContent = readme;
   } catch (error) {
-    body.innerHTML = '<p>Failed to load README content.</p>';
+    body.textContent = 'Failed to load README content.';
   }
-  
-  // Close handlers
+}
+
+export function bindReadmePreviewHandlers(container = document) {
+  if (!container || container.dataset?.readmeBound === 'true') {
+    return;
+  }
+
+  if (container.dataset) {
+    container.dataset.readmeBound = 'true';
+  }
+
+  container.addEventListener('click', async (event) => {
+    const readmeBtn = event.target.closest('.readme-btn');
+    if (!readmeBtn) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const owner = readmeBtn.dataset.owner || readmeBtn.closest('.repo-card')?.dataset.owner;
+    const repo = readmeBtn.dataset.repo || readmeBtn.closest('.repo-card')?.dataset.repo;
+    if (owner && repo) {
+      await showReadmePreview(owner, repo);
+    }
+  });
+}
+
+function setupReadmePreviewCloseHandlers() {
+  if (readmePreviewBound) {
+    return;
+  }
+
+  const preview = document.getElementById('readme-preview');
+  const closeBtn = document.querySelector('.readme-close');
+  if (!preview || !closeBtn) {
+    return;
+  }
+
   const closePreview = () => {
     preview.classList.remove('active');
   };
-  
+
   closeBtn.addEventListener('click', closePreview);
-  preview.addEventListener('click', (e) => {
-    if (e.target === preview) {
+  preview.addEventListener('click', (event) => {
+    if (event.target === preview) {
       closePreview();
     }
   });
-  
-  // Close on Escape key
-  const handleEscape = (e) => {
-    if (e.key === 'Escape') {
-      closePreview();
-      document.removeEventListener('keydown', handleEscape);
-    }
-  };
-  document.addEventListener('keydown', handleEscape);
-}
 
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closePreview();
+    }
+  });
+
+  readmePreviewBound = true;
+}
 
 // Initialize DOM elements and event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -174,7 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
   pageDescription = document.querySelector('.page-header p');
   emptyStateLink = document.querySelector('#empty-state a');
   currentOwner = getQueryParam('owner') || '';
+  setupReadmePreviewCloseHandlers();
+  if (!grid || !pagination || !resultCount) {
+    return;
+  }
+
   updateRepositoryViewCopy();
+  bindReadmePreviewHandlers(grid);
   
   // Setup event listeners
   languagePills.forEach(pill => {

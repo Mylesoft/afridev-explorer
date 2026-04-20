@@ -6,6 +6,11 @@
 @media (max-width: 1024px) {
   .navbar {
     padding: 0 var(--space-lg);
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--nav-height);
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
   }
 
   .hero .container {
@@ -28,7 +33,7 @@
   }
 
   .footer-links {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-lg);
   }
 
@@ -56,6 +61,10 @@
 
   .nav-links {
     display: none;
+  }
+
+  .theme-toggle {
+    order: 3;
   }
 
   .menu-toggle {
@@ -215,6 +224,14 @@
     gap: var(--space-lg);
   }
 
+  .country-density-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .africa-map-panel {
+    top: auto;
+  }
+
   .profile-stats {
     gap: var(--space-lg);
     font-size: 0.95rem;
@@ -262,6 +279,11 @@
 
   .nav-links {
     padding: var(--space-md);
+  }
+
+  .theme-toggle {
+    width: 100%;
+    justify-content: center;
   }
 
   .nav-link {
@@ -339,7 +361,7 @@
     font-size: 0.85rem;
   }
 
-  .leaderboard-value {
+  .leaderboard-percentage {
     font-size: 0.8rem;
   }
 

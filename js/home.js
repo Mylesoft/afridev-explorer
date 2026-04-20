@@ -2,9 +2,9 @@
  * HOME.JS - Home Page Logic
  */
 
-import { searchUsers, searchRepos, getUserEvents } from './api.js';
+import { searchUsers, searchRepos, getUserEvents, getUser, getUserRepos } from './api.js';
 import { renderDevCard, renderRepoCard, renderActivityCard, renderSpotlightDeveloper, renderCountryDensity, renderTechLeaderboard, renderTechInsights, renderErrorToast, attachCardActionHandlers } from './render.js';
-import { sanitize, debounce, setCache, getCache, formatNumber, displaySearchHistory, addToSearchHistory } from './utils.js';
+import { setCache, getCache, formatNumber, displaySearchHistory, addToSearchHistory } from './utils.js';
 
 const heroSearchBtn = document.getElementById('hero-search-btn');
 const heroSearchInput = document.getElementById('hero-search-input');
@@ -18,11 +18,61 @@ const countryDensity = document.getElementById('country-density');
 const techLeaderboard = document.getElementById('tech-leaderboard');
 const techInsights = document.getElementById('tech-insights');
 
-// Curated list of active African developers for live feed
-const ACTIVE_DEVELOPERS = [
-  'kelvinkamau', 'njerimuriuki', 'mikekagiri', 'wanjohikibui', 'daviesk',
-  'calebokoli', 'sylvance', 'paulkinuthia', 'sammykay', 'mwanakijiji'
+const ACTIVITY_SEED_COUNTRIES = [
+  'Kenya',
+  'Nigeria',
+  'South Africa',
+  'Ghana',
+  'Egypt',
+  'Rwanda'
 ];
+
+const DENSITY_COUNTRIES = [
+  'Nigeria',
+  'Kenya',
+  'South Africa',
+  'Egypt',
+  'Ghana',
+  'Morocco',
+  'Tunisia',
+  'Ethiopia'
+];
+
+async function getActiveDevelopers(limit = 6) {
+  const cacheKey = `active_developers_${limit}`;
+  const cached = getCache(cacheKey);
+  if (cached?.length) {
+    return cached;
+  }
+
+  const searches = await Promise.allSettled(
+    ACTIVITY_SEED_COUNTRIES.map((country) => searchUsers(country, 1, 4, 'location'))
+  );
+
+  const developers = [];
+  const seen = new Set();
+
+  searches.forEach((result, index) => {
+    if (result.status !== 'fulfilled') {
+      return;
+    }
+
+    (result.value.users || []).forEach((user) => {
+      if (!user?.login || seen.has(user.login.toLowerCase()) || developers.length >= limit) {
+        return;
+      }
+
+      seen.add(user.login.toLowerCase());
+      developers.push({
+        login: user.login,
+        country: ACTIVITY_SEED_COUNTRIES[index]
+      });
+    });
+  });
+
+  setCache(cacheKey, developers, 900_000);
+  return developers;
+}
 
 // Hero search functionality
 function setupHeroSearch() {
@@ -92,7 +142,8 @@ async function loadFeaturedDevelopers() {
       return;
     }
 
-    const result = await searchUsers('Kenya', 1, 6, 'location');
+    const featuredCountry = ACTIVITY_SEED_COUNTRIES[Math.floor(Math.random() * ACTIVITY_SEED_COUNTRIES.length)];
+    const result = await searchUsers(featuredCountry, 1, 6, 'location');
     
     if (!result.users || result.users.length === 0) {
       featuredDevsGrid.innerHTML = '<p>No developers found</p>';
@@ -154,9 +205,16 @@ async function loadLiveActivity() {
       return;
     }
 
-    // Fetch events from all active developers in parallel
-    const eventPromises = ACTIVE_DEVELOPERS.map(dev => 
-      getUserEvents(dev, 10).catch(() => ({ items: [] }))
+    const activeDevelopers = await getActiveDevelopers(6);
+    const eventPromises = activeDevelopers.map((developer) =>
+      getUserEvents(developer.login, 10)
+        .then((response) => ({
+          items: (response.items || []).map((event) => ({
+            ...event,
+            __country: developer.country
+          }))
+        }))
+        .catch(() => ({ items: [] }))
     );
     
     const results = await Promise.allSettled(eventPromises);
@@ -195,28 +253,32 @@ async function loadSpotlightDeveloper() {
       return;
     }
 
-    // Get a featured African developer - rotate through a curated list
-    const spotlightUsers = ['Mylesoft', 'kelvinkamau', 'njerimuriuki', 'mikekagiri', 'wanjohikibui'];
-    const randomUser = spotlightUsers[Math.floor(Math.random() * spotlightUsers.length)];
-    
-    // Fetch user data
-    const result = await searchUsers(randomUser, 1, 1, 'username');
-    
-    if (!result.users || result.users.length === 0) {
+    const trending = await searchRepos('Africa', '', 'stars', 1, 12);
+    const featuredRepo = (trending.repos || []).find((repo) => repo?.owner?.login);
+    if (!featuredRepo) {
       if (spotlightDeveloper) {
         spotlightDeveloper.innerHTML = '<p>No spotlight developer available</p>';
       }
       return;
     }
-    
-    const user = result.users[0];
-    
+
+    const [{ user }, { repos }] = await Promise.all([
+      getUser(featuredRepo.owner.login),
+      getUserRepos(featuredRepo.owner.login, 'updated', 6)
+    ]);
+
+    const spotlightData = {
+      user,
+      repos,
+      featuredRepo
+    };
+
     if (spotlightDeveloper) {
-      spotlightDeveloper.innerHTML = renderSpotlightDeveloper(user);
+      spotlightDeveloper.innerHTML = renderSpotlightDeveloper(spotlightData);
     }
     
     // Cache for 1 hour
-    setCache(cacheKey, user, 3_600_000);
+    setCache(cacheKey, spotlightData, 3_600_000);
     
   } catch (error) {
     console.error('Error loading spotlight developer:', error);
@@ -238,33 +300,36 @@ async function loadCountryDensity() {
       return;
     }
 
-    // Fetch developers from major African countries
-    const countries = [
-      { name: 'Nigeria', query: 'Nigeria' },
-      { name: 'Kenya', query: 'Kenya' },
-      { name: 'South Africa', query: 'South Africa' },
-      { name: 'Egypt', query: 'Egypt' },
-      { name: 'Ghana', query: 'Ghana' },
-      { name: 'Morocco', query: 'Morocco' },
-      { name: 'Tunisia', query: 'Tunisia' },
-      { name: 'Ethiopia', query: 'Ethiopia' }
-    ];
-
-    const countryPromises = countries.map(async (country) => {
+    const countryPromises = DENSITY_COUNTRIES.map(async (countryName) => {
       try {
-        const result = await searchUsers(country.query, 1, 100, 'location');
+        const result = await searchUsers(countryName, 1, 12, 'location');
+        const sampleUsers = result.users || [];
+        const enrichedUsers = await Promise.all(
+          sampleUsers.slice(0, 4).map(async (user) => {
+            try {
+              const { user: profile } = await getUser(user.login);
+              return profile;
+            } catch (error) {
+              return user;
+            }
+          })
+        );
+
         return {
-          name: country.name,
-          developerCount: result.total_count || 0,
-          repositories: Math.floor((result.total_count || 0) * 2.5), // Estimated repos per developer
-          percentage: 0 // Will be calculated
+          name: countryName,
+          developerCount: result.totalCount || 0,
+          repositories: enrichedUsers.reduce((sum, user) => sum + (user.public_repos || 0), 0),
+          followers: enrichedUsers.reduce((sum, user) => sum + (user.followers || 0), 0),
+          sampleUsers: enrichedUsers,
+          percentage: 0
         };
       } catch (error) {
-        console.error(`Error fetching data for ${country.name}:`, error);
+        console.error(`Error fetching data for ${countryName}:`, error);
         return {
-          name: country.name,
+          name: countryName,
           developerCount: 0,
           repositories: 0,
+          followers: 0,
           percentage: 0
         };
       }
@@ -280,6 +345,9 @@ async function loadCountryDensity() {
 
     // Sort by developer count
     countryData.sort((a, b) => b.developerCount - a.developerCount);
+    countryData.forEach((country, index) => {
+      country.rank = index + 1;
+    });
 
     if (countryDensity) {
       countryDensity.innerHTML = renderCountryDensity(countryData);
@@ -308,8 +376,7 @@ async function loadTechLeaderboard() {
       return;
     }
 
-    // Analyze languages from trending repositories
-    const result = await searchRepos('', '', 'stars', 1, 100);
+    const result = await searchRepos('Africa', '', 'stars', 1, 100);
     
     if (!result.repos || result.repos.length === 0) {
       if (techLeaderboard) {
@@ -365,18 +432,23 @@ async function loadTechInsights() {
 
     // Fetch data for insights calculation
     const [userResult, repoResult] = await Promise.allSettled([
-      searchUsers('Africa', 1, 100, 'location'),
-      searchRepos('', '', 'stars', 1, 200)
+      Promise.allSettled(DENSITY_COUNTRIES.map((country) => searchUsers(country, 1, 1, 'location'))),
+      searchRepos('Africa', '', 'stars', 1, 200)
     ]);
 
-    const users = userResult.status === 'fulfilled' ? userResult.value : { users: [], total_count: 0 };
+    const userSearches = userResult.status === 'fulfilled' ? userResult.value : [];
     const repos = repoResult.status === 'fulfilled' ? repoResult.value : { repos: [] };
 
     // Calculate insights based on real data
-    const totalDevelopers = users.total_count || 0;
+    const totalDevelopers = userSearches.reduce((sum, result) => (
+      result.status === 'fulfilled' ? sum + (result.value.totalCount || 0) : sum
+    ), 0);
     const totalRepos = repos.repos?.length || 0;
     const totalStars = repos.repos?.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0) || 0;
     const totalForks = repos.repos?.reduce((sum, repo) => sum + (repo.forks_count || 0), 0) || 0;
+    const averageStars = totalRepos ? Math.round(totalStars / totalRepos) : 0;
+    const averageForks = totalRepos ? Math.round(totalForks / totalRepos) : 0;
+    const forkRate = totalStars ? Math.round((totalForks / totalStars) * 100) : 0;
 
     // Generate dynamic insights
     const insights = [
@@ -401,7 +473,7 @@ async function loadTechInsights() {
         stats: [
           `${formatNumber(totalStars)} Total Stars`,
           `${formatNumber(totalForks)} Total Forks`,
-          `${Math.round(totalStars / totalRepos)} Avg Stars/Repo`
+          `${averageStars} Avg Stars/Repo`
         ],
         icon: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/>
@@ -414,7 +486,7 @@ async function loadTechInsights() {
         description: `High activity level with ${formatNumber(totalRepos)} repositories maintained by African developers, demonstrating consistent contributions to global tech ecosystem.`,
         stats: [
           `${formatNumber(totalRepos)} Active Repositories`,
-          `${Math.round(totalForks / totalRepos)} Avg Forks/Repo`,
+          `${averageForks} Avg Forks/Repo`,
           `${formatNumber(totalStars + totalForks)} Total Interactions`
         ],
         icon: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -426,7 +498,7 @@ async function loadTechInsights() {
         description: `Strong community engagement with ${formatNumber(totalForks)} forks showing collaborative development and knowledge sharing across African tech community.`,
         stats: [
           `${formatNumber(totalForks)} Community Forks`,
-          `${Math.round((totalForks / totalStars) * 100)}% Fork Rate`,
+          `${forkRate}% Fork Rate`,
           `${formatNumber(totalDevelopers)} Contributors`
         ],
         icon: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

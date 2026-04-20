@@ -1,0 +1,23 @@
+<svg width="640" height="720" viewBox="0 0 640 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="africaFill" x1="122" y1="84" x2="515" y2="615" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9B15D"/>
+      <stop offset="0.52" stop-color="#C79639"/>
+      <stop offset="1" stop-color="#1A395B"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="151" y1="103" x2="470" y2="588" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7D6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FFF7D6" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="720" rx="36" fill="#F7FAFC"/>
+  <path d="M242 88L311 101L380 95L447 127L469 182L455 247L497 312L482 366L436 421L429 492L392 533L356 592L316 625L264 585L227 563L192 500L150 466L126 410L145 339L138 267L168 211L178 154L213 133L242 88Z" fill="url(#africaFill)"/>
+  <path d="M308 626L336 650L359 683L332 696L301 665L290 634L308 626Z" fill="#1A395B" fill-opacity="0.88"/>
+  <path d="M242 88L311 101L380 95L447 127L469 182L455 247L497 312L482 366L436 421L429 492L392 533L356 592L316 625L264 585L227 563L192 500L150 466L126 410L145 339L138 267L168 211L178 154L213 133L242 88Z" fill="url(#glow)" fill-opacity="0.45"/>
+  <circle cx="261" cy="292" r="12" fill="#FFF3C7"/>
+  <circle cx="333" cy="350" r="15" fill="#FFF3C7"/>
+  <circle cx="384" cy="272" r="10" fill="#FFF3C7"/>
+  <circle cx="228" cy="423" r="9" fill="#FFF3C7"/>
+  <path d="M261 292L333 350L384 272" stroke="#FFF3C7" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 12"/>
+  <path d="M333 350L228 423" stroke="#FFF3C7" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 12"/>
+</svg>

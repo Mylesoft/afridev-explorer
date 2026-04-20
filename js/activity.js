@@ -1,16 +1,58 @@
 // activity.js - live activity feed page logic
 import { getUserEvents } from './api.js';
+import { searchUsers } from './api.js';
 import { renderActivityCard, renderSkeletonCards, renderEmptyState, renderErrorToast } from './render.js';
 import { setCache, getCache, debounce } from './utils.js';
 
-// Curated list of active African developers for the live feed
-const ACTIVE_DEVELOPERS = [
-  'kelvinkamau', 'njerimuriuki', 'mikekagiri', 'wanjohikibui', 'daviesk',
-  'calebokoli', 'sylvance', 'paulkinuthia', 'sammykay', 'mwanakijiji'
+const ACTIVITY_SEED_COUNTRIES = [
+  'Kenya',
+  'Nigeria',
+  'South Africa',
+  'Ghana',
+  'Egypt',
+  'Rwanda',
+  'Uganda',
+  'Morocco'
 ];
 
 let refreshInterval;
 let isPaused = false;
+
+async function getActiveDevelopers(limit = 10) {
+  const cacheKey = `activity_seed_developers_${limit}`;
+  const cached = getCache(cacheKey);
+  if (cached?.length) {
+    return cached;
+  }
+
+  const searches = await Promise.allSettled(
+    ACTIVITY_SEED_COUNTRIES.map((country) => searchUsers(country, 1, 3, 'location'))
+  );
+
+  const developers = [];
+  const seen = new Set();
+
+  searches.forEach((result, index) => {
+    if (result.status !== 'fulfilled') {
+      return;
+    }
+
+    (result.value.users || []).forEach((user) => {
+      if (!user?.login || seen.has(user.login.toLowerCase()) || developers.length >= limit) {
+        return;
+      }
+
+      seen.add(user.login.toLowerCase());
+      developers.push({
+        login: user.login,
+        country: ACTIVITY_SEED_COUNTRIES[index]
+      });
+    });
+  });
+
+  setCache(cacheKey, developers, 900_000);
+  return developers;
+}
 
 // Initialize activity feed
 async function initActivityFeed() {
@@ -40,9 +82,16 @@ async function loadActivityFeed() {
       return;
     }
 
-    // Fetch events from all active developers in parallel
-    const eventPromises = ACTIVE_DEVELOPERS.map(dev => 
-      getUserEvents(dev, 20).catch(() => ({ items: [] }))
+    const activeDevelopers = await getActiveDevelopers(10);
+    const eventPromises = activeDevelopers.map((developer) =>
+      getUserEvents(developer.login, 20)
+        .then((response) => ({
+          items: (response.items || []).map((event) => ({
+            ...event,
+            __country: developer.country
+          }))
+        }))
+        .catch(() => ({ items: [] }))
     );
     
     const results = await Promise.allSettled(eventPromises);
@@ -102,7 +151,7 @@ function filterEvents(events) {
     }
     
     // Filter by country (based on developer location)
-    if (selectedCountry && !isFromCountry(event.actor, selectedCountry)) {
+    if (selectedCountry && !isFromCountry(event, selectedCountry)) {
       return false;
     }
     
@@ -123,9 +172,8 @@ function getSelectedCountry() {
 }
 
 // Check if developer is from specified country
-function isFromCountry(actor, country) {
-  if (!actor.location) return false;
-  return actor.location.toLowerCase().includes(country.toLowerCase());
+function isFromCountry(event, country) {
+  return (event.__country || '').toLowerCase() === country.toLowerCase();
 }
 
 // Setup event type filters

@@ -64,10 +64,10 @@
       </div>
     </section>
 
-    <section class="similar-developers">
+    <section class="profile-repos">
       <div class="container">
-        <div class="section-header"><h2>Similar Developers</h2></div>
-        <div id="similar-developers-grid" class="card-grid">
+        <div class="section-header"><h2>Top Repositories</h2></div>
+        <div id="profile-repos-grid" class="card-grid">
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
@@ -75,10 +75,10 @@
       </div>
     </section>
 
-    <section class="profile-repos">
+    <section class="similar-developers">
       <div class="container">
-        <div class="section-header"><h2>Top Repositories</h2></div>
-        <div id="profile-repos-grid" class="card-grid">
+        <div class="section-header"><h2>Similar Developers</h2></div>
+        <div id="similar-developers-grid" class="card-grid">
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
           <div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>
@@ -129,9 +129,20 @@
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
 
+  <div id="readme-preview" class="readme-preview">
+    <div class="readme-preview-content">
+      <div class="readme-preview-header">
+        <h3 id="readme-title">README</h3>
+        <button class="readme-close" aria-label="Close preview">close</button>
+      </div>
+      <div id="readme-body" class="readme-body"></div>
+    </div>
+  </div>
+
   <noscript><div style="padding: 2rem; text-align: center;"><p>Please enable JavaScript to view this profile.</p></div></noscript>
 
-    <script type="module" src="js/navbar.js"></script>
+  <script src="js/local-config.js"></script>
+  <script type="module" src="js/navbar.js"></script>
   <script type="module" src="js/profile.js"></script>
 </body>
 </html>

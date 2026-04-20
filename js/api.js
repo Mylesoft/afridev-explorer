@@ -4,11 +4,54 @@
  */
 
 const BASE_URL = 'https://api.github.com';
-const GITHUB_TOKEN = window.AFRIDEV_GITHUB_TOKEN || '';
+const TOKEN_STORAGE_KEY = 'afridev_github_token';
 
-const headers = GITHUB_TOKEN
-  ? { Authorization: `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-  : { 'Accept': 'application/vnd.github.v3+json' };
+export function getGitHubToken() {
+  return (
+    window.AFRIDEV_GITHUB_TOKEN ||
+    localStorage.getItem(TOKEN_STORAGE_KEY) ||
+    sessionStorage.getItem(TOKEN_STORAGE_KEY) ||
+    ''
+  ).trim();
+}
+
+export function setGitHubToken(token, persist = true) {
+  const trimmedToken = (token || '').trim();
+  window.AFRIDEV_GITHUB_TOKEN = trimmedToken;
+
+  if (!trimmedToken) {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    return '';
+  }
+
+  if (persist) {
+    localStorage.setItem(TOKEN_STORAGE_KEY, trimmedToken);
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+  } else {
+    sessionStorage.setItem(TOKEN_STORAGE_KEY, trimmedToken);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  }
+
+  return trimmedToken;
+}
+
+export function clearGitHubToken() {
+  setGitHubToken('');
+}
+
+function getRequestHeaders() {
+  const token = getGitHubToken();
+  return token
+    ? { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    : { Accept: 'application/vnd.github.v3+json' };
+}
+
+window.AfriDevExplorer = Object.assign(window.AfriDevExplorer || {}, {
+  getGitHubToken,
+  setGitHubToken,
+  clearGitHubToken
+});
 
 /**
  * Retry function with exponential backoff
@@ -54,7 +97,10 @@ export function handleApiError(response) {
   if (response.status === 403 || response.status === 429) {
     const rateLimitInfo = checkRateLimit(response.headers);
     const resetTime = rateLimitInfo.reset ? new Date(rateLimitInfo.reset * 1000).toLocaleTimeString() : 'unknown';
-    throw new Error(`Rate limit exceeded. Resets at ${resetTime}. Please try again later.`);
+    const tokenHelp = getGitHubToken()
+      ? ''
+      : ` Add a token with window.AfriDevExplorer.setGitHubToken('YOUR_TOKEN') and refresh.`;
+    throw new Error(`Rate limit exceeded. Resets at ${resetTime}. Please try again later.${tokenHelp}`);
   }
   if (response.status === 404) {
     throw new Error('Not found.');
@@ -104,7 +150,7 @@ export async function searchUsers(query, page = 1, perPage = 12, type = 'locatio
   const url = `${BASE_URL}/search/users?q=${searchQuery}&sort=followers&per_page=${perPage}&page=${page}`;
 
   return retryWithBackoff(async () => {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -125,7 +171,7 @@ export async function getUser(username) {
   const url = `${BASE_URL}/users/${encodeURIComponent(username)}`;
 
   return retryWithBackoff(async () => {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -147,7 +193,7 @@ export async function getUserRepos(username, sort = 'stars', perPage = 6) {
   const url = `${BASE_URL}/users/${encodeURIComponent(username)}/repos?sort=${sort}&per_page=${perPage}`;
 
   return retryWithBackoff(async () => {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -174,7 +220,7 @@ export async function searchRepos(location = 'Africa', language = '', sort = 'st
   const url = `${BASE_URL}/search/repositories?q=${encodeURIComponent(query)}&sort=${sort}&per_page=${perPage}&page=${page}`;
 
   return retryWithBackoff(async () => {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -205,7 +251,7 @@ export async function searchDevelopersByTech(tech, location = '', page = 1, perP
   const url = `${BASE_URL}/search/repositories?q=${query}&sort=stars&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -250,7 +296,7 @@ export async function searchCofounders(location = '', page = 1, perPage = 12, da
   const url = `${BASE_URL}/search/users?q=${query}&sort=followers&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -283,7 +329,7 @@ export async function searchJobSeekers(location = '', page = 1, perPage = 12, da
   const url = `${BASE_URL}/search/users?q=${query}&sort=followers&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -313,7 +359,7 @@ export async function getTrendingIssues(page = 1, perPage = 8) {
   const url = `${BASE_URL}/search/issues?q=${query}&sort=stars&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -345,7 +391,7 @@ export async function getUserEvents(username, perPage = 20) {
   const url = `${BASE_URL}/users/${encodeURIComponent(username)}/events?per_page=${perPage}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -379,7 +425,7 @@ export async function getTrendingRepositories(language = '', page = 1, perPage =
   const url = `${BASE_URL}/search/repositories?q=${query}&sort=stars&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -404,7 +450,7 @@ export async function getRepoReadme(owner, repo) {
   const url = `${BASE_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/readme`;
   
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     if (response.status === 404) {
       return 'No README found for this repository.';
     }
@@ -441,7 +487,7 @@ export async function searchByFramework(framework, location = '', page = 1, perP
   const url = `${BASE_URL}/search/repositories?q=${query}&sort=stars&per_page=${perPage}&page=${page}`;
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     handleApiError(response);
 
     const data = await response.json();
@@ -502,7 +548,7 @@ export async function apiFetchWithRateLimit(endpoint) {
   const url = `${BASE_URL}${endpoint}`;
   
   return retryWithBackoff(async () => {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: getRequestHeaders() });
     
     // Store rate limit information for UI display
     const remaining = response.headers.get('X-RateLimit-Remaining');

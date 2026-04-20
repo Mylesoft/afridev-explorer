@@ -23,9 +23,12 @@ export function applyTheme(theme = getPreferredTheme()) {
     const isDark = theme === 'dark';
     toggle.setAttribute('aria-pressed', String(isDark));
     toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    toggle.dataset.theme = theme;
     toggle.innerHTML = `
-      <span class="theme-toggle__icon" aria-hidden="true">${isDark ? 'sunny' : 'dark_mode'}</span>
-      <span class="theme-toggle__label">${isDark ? 'Light' : 'Dark'}</span>
+      <span class="theme-toggle__track" aria-hidden="true">
+        <span class="theme-toggle__glyph theme-toggle__glyph--sun">☀</span>
+        <span class="theme-toggle__glyph theme-toggle__glyph--moon">☾</span>
+      </span>
     `;
   }
 }

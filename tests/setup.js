@@ -18,6 +18,21 @@ const localStorageMock = {
 };
 global.localStorage = localStorageMock;
 global.localStorageMock = localStorageMock;
+const sessionStorageMock = {
+  store: {},
+  getItem: jest.fn((key) => sessionStorageMock.store[key] ?? null),
+  setItem: jest.fn((key, value) => {
+    sessionStorageMock.store[key] = String(value);
+  }),
+  removeItem: jest.fn((key) => {
+    delete sessionStorageMock.store[key];
+  }),
+  clear: jest.fn(() => {
+    sessionStorageMock.store = {};
+  }),
+};
+global.sessionStorage = sessionStorageMock;
+global.sessionStorageMock = sessionStorageMock;
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
@@ -66,3 +81,31 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   unobserve: jest.fn(),
   disconnect: jest.fn(),
 }));
+
+Object.defineProperty(global.navigator, 'clipboard', {
+  value: {
+    writeText: jest.fn().mockResolvedValue(),
+  },
+  writable: true,
+});
+
+beforeEach(() => {
+  localStorageMock.store = {};
+  localStorageMock.getItem.mockClear();
+  localStorageMock.setItem.mockClear();
+  localStorageMock.removeItem.mockClear();
+  localStorageMock.clear.mockClear();
+
+  sessionStorageMock.store = {};
+  sessionStorageMock.getItem.mockClear();
+  sessionStorageMock.setItem.mockClear();
+  sessionStorageMock.removeItem.mockClear();
+  sessionStorageMock.clear.mockClear();
+
+  if (global.navigator?.clipboard?.writeText) {
+    global.navigator.clipboard.writeText.mockClear();
+    global.navigator.clipboard.writeText.mockResolvedValue();
+  }
+
+  fetch.mockReset();
+});

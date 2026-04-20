@@ -1,118 +1,135 @@
 /**
  * API.JS TESTS
- * Unit tests for GitHub API integration functions
+ * Focused tests for the current GitHub API helpers.
  */
 
 import {
-  apiFetch,
-  getUser,
-  searchUsers,
-  searchRepos,
-  getUserRepos,
-  getUserEvents,
+  apiFetchWithRateLimit,
+  clearGitHubToken,
+  getGitHubToken,
   getRepoReadme,
+  getUser,
+  getUserEvents,
+  getUserRepos,
+  handleApiError,
   searchByFramework,
-  searchDevelopersByTech,
   searchCofounders,
+  searchDevelopersByTech,
   searchJobSeekers,
+  searchRepos,
+  searchUsers,
+  setGitHubToken,
   updateRateLimitDisplay
 } from '../js/api.js';
 
-// Mock fetch globally
 global.fetch = jest.fn();
-
-// Mock DOM elements for rate limit display
-document.getElementById = jest.fn((id) => {
-  if (id === 'rate-limit-fill') {
-    return { style: { width: '' } };
-  }
-  if (id === 'rate-limit-label') {
-    return { textContent: '' };
-  }
-  return null;
-});
 
 describe('API Functions', () => {
   beforeEach(() => {
-    fetch.mockClear();
-    localStorageMock.clear();
+    fetch.mockReset();
+    localStorage.clear();
+    sessionStorage.clear();
+    delete window.AFRIDEV_GITHUB_TOKEN;
+    delete window.__rateLimitInfo;
+    document.body.innerHTML = `
+      <div class="rate-limit-fill"></div>
+      <div class="rate-limit-label"></div>
+    `;
   });
 
-  describe('apiFetch', () => {
-    test('should make successful API request', async () => {
-      const mockResponse = { data: 'test' };
+  describe('token helpers', () => {
+    test('stores and clears a persistent token', () => {
+      setGitHubToken('ghp_test_token');
+
+      expect(getGitHubToken()).toBe('ghp_test_token');
+      expect(localStorage.getItem('afridev_github_token')).toBe('ghp_test_token');
+
+      clearGitHubToken();
+
+      expect(getGitHubToken()).toBe('');
+      expect(localStorage.getItem('afridev_github_token')).toBeNull();
+    });
+
+    test('can store a session-only token', () => {
+      setGitHubToken('ghp_session_token', false);
+
+      expect(getGitHubToken()).toBe('ghp_session_token');
+      expect(sessionStorage.getItem('afridev_github_token')).toBe('ghp_session_token');
+      expect(localStorage.getItem('afridev_github_token')).toBeNull();
+    });
+  });
+
+  describe('handleApiError', () => {
+    test('throws a 404 message for missing resources', () => {
+      expect(() => handleApiError({ status: 404, ok: false })).toThrow('Not found.');
+    });
+
+    test('includes token guidance on rate limit errors when no token is set', () => {
+      const response = {
+        status: 403,
+        ok: false,
+        headers: new Headers({
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Reset': '1893456000'
+        })
+      };
+
+      expect(() => handleApiError(response)).toThrow(/Add a token with window\.AfriDevExplorer\.setGitHubToken/);
+    });
+  });
+
+  describe('apiFetchWithRateLimit', () => {
+    test('fetches JSON and updates the shared rate limit UI', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => ({ ok: true }),
         headers: new Headers({
-          'x-ratelimit-remaining': '5000',
-          'x-ratelimit-limit': '5000'
+          'X-RateLimit-Remaining': '45',
+          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Reset': '1893456000'
         })
       });
 
-      const result = await apiFetch('/test');
-      expect(result).toEqual(mockResponse);
+      const result = await apiFetchWithRateLimit('/test');
+
+      expect(result).toEqual({ ok: true });
       expect(fetch).toHaveBeenCalledWith(
         'https://api.github.com/test',
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': expect.stringContaining('token')
+            Accept: 'application/vnd.github.v3+json'
+          })
+        })
+      );
+      expect(document.querySelector('.rate-limit-fill').style.width).toBe('75%');
+      expect(document.querySelector('.rate-limit-label').textContent).toBe('45/60 API calls');
+    });
+
+    test('sends the stored token when one exists', async () => {
+      setGitHubToken('ghp_header_token');
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ok: true }),
+        headers: new Headers()
+      });
+
+      await apiFetchWithRateLimit('/secure');
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.github.com/secure',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'token ghp_header_token'
           })
         })
       );
     });
-
-    test('should handle API errors correctly', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      });
-
-      await expect(apiFetch('/test')).rejects.toThrow('Not Found');
-    });
-
-    test('should handle rate limiting', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        statusText: 'Forbidden'
-      });
-
-      await expect(apiFetch('/test')).rejects.toThrow('Rate limit exceeded');
-    });
-
-    test('should update rate limit display', async () => {
-      const mockResponse = { data: 'test' };
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-        headers: new Headers({
-          'x-ratelimit-remaining': '4500',
-          'x-ratelimit-limit': '5000'
-        })
-      });
-
-      await apiFetch('/test');
-      
-      const fillElement = document.getElementById('rate-limit-fill');
-      const labelElement = document.getElementById('rate-limit-label');
-      
-      expect(fillElement.style.width).toBe('90%');
-      expect(labelElement.textContent).toBe('4500/5000 API calls');
-    });
   });
 
-  describe('getUser', () => {
-    test('should fetch user data successfully', async () => {
-      const mockUser = {
-        login: 'testuser',
-        name: 'Test User',
-        followers: 100,
-        public_repos: 50
-      };
-      
+  describe('resource helpers', () => {
+    test('getUser fetches a profile', async () => {
+      const mockUser = { login: 'testuser', followers: 100 };
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockUser,
@@ -120,119 +137,30 @@ describe('API Functions', () => {
       });
 
       const result = await getUser('testuser');
+
       expect(result.user).toEqual(mockUser);
-      expect(fetch).toHaveBeenCalledWith(
-        'https://api.github.com/users/testuser',
-        expect.any(Object)
-      );
+      expect(fetch).toHaveBeenCalledWith('https://api.github.com/users/testuser', expect.any(Object));
     });
 
-    test('should handle user not found', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      });
-
-      await expect(getUser('nonexistent')).rejects.toThrow('Not Found');
-    });
-  });
-
-  describe('searchUsers', () => {
-    test('should search users with query', async () => {
-      const mockResponse = {
-        items: [
-          { login: 'user1', name: 'User One' },
-          { login: 'user2', name: 'User Two' }
-        ],
-        total_count: 2
-      };
-      
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-        headers: new Headers()
-      });
-
-      const result = await searchUsers('test query', 'location', 1, 10);
-      expect(result.users).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(2);
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/users?q=test query+location:location'),
-        expect.any(Object)
-      );
-    });
-
-    test('should handle empty search results', async () => {
-      const mockResponse = { items: [], total_count: 0 };
-      
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-        headers: new Headers()
-      });
-
-      const result = await searchUsers('noresults', 'location', 1, 10);
-      expect(result.users).toEqual([]);
-      expect(result.totalCount).toBe(0);
-    });
-  });
-
-  describe('searchRepos', () => {
-    test('should search repositories with filters', async () => {
-      const mockResponse = {
-        items: [
-          { name: 'repo1', stargazers_count: 100 },
-          { name: 'repo2', stargazers_count: 50 }
-        ],
-        total_count: 2
-      };
-      
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-        headers: new Headers()
-      });
-
-      const result = await searchRepos('test', 'language', 'stars', 1, 10);
-      expect(result.repos).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(2);
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/repositories?q=test+language:language'),
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('getUserRepos', () => {
-    test('should fetch user repositories', async () => {
-      const mockRepos = [
-        { name: 'repo1', stargazers_count: 100 },
-        { name: 'repo2', stargazers_count: 50 }
-      ];
-      
+    test('getUserRepos fetches repositories', async () => {
+      const mockRepos = [{ name: 'repo1' }, { name: 'repo2' }];
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockRepos,
         headers: new Headers()
       });
 
-      const result = await getUserRepos('testuser', 'stars', 10);
+      const result = await getUserRepos('testuser', 'updated', 4);
+
       expect(result.repos).toEqual(mockRepos);
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.github.com/users/testuser/repos?sort=stars&per_page=10',
+        'https://api.github.com/users/testuser/repos?sort=updated&per_page=4',
         expect.any(Object)
       );
     });
-  });
 
-  describe('getUserEvents', () => {
-    test('should fetch user events', async () => {
-      const mockEvents = [
-        { type: 'PushEvent', created_at: '2023-01-01T00:00:00Z' },
-        { type: 'IssuesEvent', created_at: '2023-01-02T00:00:00Z' }
-      ];
-      
+    test('getUserEvents fetches a user activity feed', async () => {
+      const mockEvents = [{ type: 'PushEvent' }];
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockEvents,
@@ -240,228 +168,174 @@ describe('API Functions', () => {
       });
 
       const result = await getUserEvents('testuser', 10);
+
       expect(result.items).toEqual(mockEvents);
       expect(fetch).toHaveBeenCalledWith(
         'https://api.github.com/users/testuser/events?per_page=10',
         expect.any(Object)
       );
     });
-  });
 
-  describe('getRepoReadme', () => {
-    test('should fetch repository README', async () => {
-      const mockReadme = '# Test Repository\nThis is a test README.';
-      
+    test('getRepoReadme decodes the GitHub readme payload', async () => {
+      const readme = '# Test Repository';
       fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ content: btoa(mockReadme) }),
+        json: async () => ({ content: btoa(readme) }),
         headers: new Headers()
       });
 
-      const result = await getRepoReadme('owner', 'repo');
-      expect(result).toBe(mockReadme);
+      await expect(getRepoReadme('owner', 'repo')).resolves.toBe(readme);
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.github.com/repos/owner/repo/contents/README.md',
+        'https://api.github.com/repos/owner/repo/readme',
         expect.any(Object)
       );
     });
 
-    test('should handle README not found', async () => {
+    test('getRepoReadme returns a friendly fallback for missing files', async () => {
       fetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
-        statusText: 'Not Found'
-      });
-
-      await expect(getRepoReadme('owner', 'repo')).rejects.toThrow('Not Found');
-    });
-  });
-
-  describe('searchByFramework', () => {
-    test('should search by framework topic', async () => {
-      const mockResponse = {
-        items: [
-          { login: 'dev1', name: 'Developer One' },
-          { login: 'dev2', name: 'Developer Two' }
-        ],
-        total_count: 2
-      };
-      
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
         headers: new Headers()
       });
 
-      const result = await searchByFramework('react', 'kenya', 1, 10);
-      expect(result.users).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(2);
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/users?q=react+location:kenya'),
-        expect.any(Object)
-      );
+      await expect(getRepoReadme('owner', 'repo')).resolves.toBe('No README found for this repository.');
     });
   });
 
-  describe('searchDevelopersByTech', () => {
-    test('should search developers by technology', async () => {
-      const mockResponse = {
-        items: [
-          { login: 'dev1', name: 'Developer One' }
-        ],
-        total_count: 1
-      };
-      
+  describe('search helpers', () => {
+    test('searchUsers builds a location search by default', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => ({ items: [{ login: 'user1' }], total_count: 1 }),
+        headers: new Headers()
+      });
+
+      const result = await searchUsers('Kenya', 2, 5);
+
+      expect(result.users).toEqual([{ login: 'user1' }]);
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.github.com/search/users?q=location%3AKenya&sort=followers&per_page=5&page=2',
+        expect.any(Object)
+      );
+    });
+
+    test('searchUsers supports username searches when requested', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [], total_count: 0 }),
+        headers: new Headers()
+      });
+
+      await searchUsers('octocat', 1, 12, 'username');
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.github.com/search/users?q=octocat&sort=followers&per_page=12&page=1',
+        expect.any(Object)
+      );
+    });
+
+    test('searchRepos builds user-owned repository queries', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [{ name: 'repo1' }], total_count: 1 }),
+        headers: new Headers()
+      });
+
+      const result = await searchRepos('Africa', 'JavaScript', 'stars', 1, 10, 'octocat');
+
+      expect(result.repos).toEqual([{ name: 'repo1' }]);
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.github.com/search/repositories?q=user%3Aoctocat%2Blanguage%3AJavaScript&sort=stars&per_page=10&page=1',
+        expect.any(Object)
+      );
+    });
+
+    test('searchDevelopersByTech returns unique repo owners', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          items: [
+            { owner: { login: 'dev1' } },
+            { owner: { login: 'dev1' } },
+            { owner: { login: 'dev2' } }
+          ],
+          total_count: 3
+        }),
         headers: new Headers()
       });
 
       const result = await searchDevelopersByTech('javascript', 'nigeria', 1, 10);
-      expect(result.users).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(1);
+
+      expect(result.users).toEqual([{ login: 'dev1' }, { login: 'dev2' }]);
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/users?q=javascript+location:nigeria'),
+        'https://api.github.com/search/repositories?q=language:javascript location:nigeria&sort=stars&per_page=10&page=1',
         expect.any(Object)
       );
     });
-  });
 
-  describe('searchCofounders', () => {
-    test('should search for co-founders', async () => {
-      const mockResponse = {
-        items: [
-          { login: 'founder1', name: 'Founder One' }
-        ],
-        total_count: 1
-      };
-      
+    test('searchByFramework returns unique repository owners', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => ({
+          items: [
+            { owner: { login: 'dev1' } },
+            { owner: { login: 'dev2' } }
+          ],
+          total_count: 2
+        }),
+        headers: new Headers()
+      });
+
+      const result = await searchByFramework('react', 'kenya', 1, 10);
+
+      expect(result.users).toEqual([{ login: 'dev1' }, { login: 'dev2' }]);
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.github.com/search/repositories?q=topic:react location:kenya&sort=stars&per_page=10&page=1',
+        expect.any(Object)
+      );
+    });
+
+    test('searchCofounders searches bios with location context', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [{ login: 'founder1' }], total_count: 1 }),
         headers: new Headers()
       });
 
       const result = await searchCofounders('south africa', 1, 10);
-      expect(result.users).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(1);
+
+      expect(result.users).toEqual([{ login: 'founder1' }]);
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/users?q+location:south africa'),
+        'https://api.github.com/search/users?q=cofounder OR co-founder OR "looking for cofounder" in:bio location:south%20africa&sort=followers&per_page=10&page=1',
         expect.any(Object)
       );
     });
-  });
 
-  describe('searchJobSeekers', () => {
-    test('should search for job seekers', async () => {
-      const mockResponse = {
-        items: [
-          { login: 'seeker1', name: 'Job Seeker One' }
-        ],
-        total_count: 1
-      };
-      
+    test('searchJobSeekers searches for hire-related bios', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => ({ items: [{ login: 'seeker1' }], total_count: 1 }),
         headers: new Headers()
       });
 
       const result = await searchJobSeekers('ghana', 1, 10);
-      expect(result.users).toEqual(mockResponse.items);
-      expect(result.totalCount).toBe(1);
+
+      expect(result.users).toEqual([{ login: 'seeker1' }]);
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('search/users?q+location:ghana'),
+        'https://api.github.com/search/users?q=hiring OR "looking for work" OR "available for hire" OR "open to work" in:bio location:ghana&sort=followers&per_page=10&page=1',
         expect.any(Object)
       );
     });
   });
 
   describe('updateRateLimitDisplay', () => {
-    test('should update rate limit display correctly', () => {
-      const mockHeaders = {
-        get: jest.fn()
-      };
-      mockHeaders.get.mockReturnValueOnce('4500').mockReturnValueOnce('5000');
+    test('renders the saved rate limit info into the navbar bar', () => {
+      window.__rateLimitInfo = { remaining: 30, limit: 60 };
 
-      updateRateLimitDisplay(mockHeaders);
+      updateRateLimitDisplay();
 
-      const fillElement = document.getElementById('rate-limit-fill');
-      const labelElement = document.getElementById('rate-limit-label');
-      
-      expect(fillElement.style.width).toBe('90%');
-      expect(labelElement.textContent).toBe('4500/5000 API calls');
-    });
-
-    test('should handle missing rate limit headers', () => {
-      const mockHeaders = {
-        get: jest.fn().mockReturnValue(null)
-      };
-
-      expect(() => updateRateLimitDisplay(mockHeaders)).not.toThrow();
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('should handle network errors', async () => {
-      fetch.mockRejectedValueOnce(new Error('Network error'));
-
-      await expect(apiFetch('/test')).rejects.toThrow('Network error');
-    });
-
-    test('should handle malformed JSON', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => {
-          throw new Error('Invalid JSON');
-        },
-        headers: new Headers()
-      });
-
-      await expect(apiFetch('/test')).rejects.toThrow('Invalid JSON');
-    });
-
-    test('should handle unauthorized requests', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized'
-      });
-
-      await expect(apiFetch('/test')).rejects.toThrow('Unauthorized');
-    });
-  });
-
-  describe('Retry Mechanism', () => {
-    test('should retry on rate limit errors', async () => {
-      // First call fails with rate limit
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 429,
-        statusText: 'Too Many Requests'
-      });
-      
-      // Second call succeeds
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ data: 'success' }),
-        headers: new Headers()
-      });
-
-      // Mock setTimeout for retry delay
-      jest.useFakeTimers();
-      
-      const promise = apiFetch('/test');
-      
-      // Fast-forward past the retry delay
-      jest.advanceTimersByTime(2000);
-      
-      const result = await promise;
-      expect(result).toEqual({ data: 'success' });
-      expect(fetch).toHaveBeenCalledTimes(2);
-      
-      jest.useRealTimers();
+      expect(document.querySelector('.rate-limit-fill').style.width).toBe('50%');
+      expect(document.querySelector('.rate-limit-label').textContent).toBe('30/60 API calls');
     });
   });
 });

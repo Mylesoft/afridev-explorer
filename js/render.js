@@ -140,6 +140,7 @@ export function renderRepoCard(repo) {
  * @returns {string} - HTML string for the profile header
  */
 export function renderProfileHeader(user = {}) {
+  user = user || {};
   const login = user.login || 'unknown-user';
   const displayName = user.name || login;
   const bookmarked = isBookmarked(login);

@@ -25,7 +25,8 @@ jest.mock('../js/utils.js', () => ({
   timeAgo: jest.fn((date) => '2 days ago'),
   getLanguageColor: jest.fn((lang) => '#f1e05a'),
   isBookmarked: jest.fn(() => false),
-  getMaxPages: jest.fn(() => 10)
+  toggleBookmark: jest.fn(),
+  copyProfileLink: jest.fn(() => Promise.resolve())
 }));
 
 // Mock DOM methods
@@ -400,7 +401,10 @@ describe('Render Functions', () => {
         html_url: 'https://github.com/testuser'
       };
 
-      const result = renderSpotlightDeveloper(mockUser);
+      const result = renderSpotlightDeveloper({
+        ...mockUser,
+        repos: [{ name: 'featured-repo', stargazers_count: 25 }]
+      });
 
       expect(result).toContain('Test User');
       expect(result).toContain('testuser');
@@ -419,9 +423,7 @@ describe('Render Functions', () => {
       // Mock DOM elements
       const mockContainer = {
         addEventListener: jest.fn(),
-        querySelectorAll: jest.fn(() => [
-          { classList: { contains: jest.fn() }, dataset: { username: 'testuser' } }
-        ])
+        dataset: {}
       };
 
       // Mock document.querySelector
@@ -433,36 +435,24 @@ describe('Render Functions', () => {
     });
 
     test('should handle bookmark clicks', () => {
+      require('../js/utils.js').isBookmarked.mockReturnValue(true);
       const mockContainer = {
         addEventListener: jest.fn(),
-        querySelectorAll: jest.fn(() => [
-          { 
-            classList: { contains: jest.fn().mockReturnValue(true) }, 
-            dataset: { username: 'testuser' },
-            textContent: 'star_border',
-            classList: { toggle: jest.fn() }
-          }
-        ])
+        dataset: {}
       };
 
       document.querySelector = jest.fn(() => mockContainer);
-      
-      // Mock toggleBookmark
-      jest.doMock('../js/utils.js', () => ({
-        ...jest.requireActual('../js/utils.js'),
-        toggleBookmark: jest.fn()
-      }));
 
       attachCardActionHandlers();
 
+      const mockButton = {
+        dataset: { username: 'testuser' },
+        textContent: 'star_border',
+        classList: { toggle: jest.fn() }
+      };
       const clickHandler = mockContainer.addEventListener.mock.calls[0][1];
       const mockEvent = {
-        target: { closest: jest.fn().mockReturnValue({ 
-          classList: { contains: jest.fn().mockReturnValue(true) }, 
-          dataset: { username: 'testuser' },
-          textContent: 'star_border',
-          classList: { toggle: jest.fn() }
-        })},
+        target: { closest: jest.fn((selector) => selector === '.bookmark-btn' ? mockButton : null)},
         preventDefault: jest.fn(),
         stopPropagation: jest.fn()
       };
@@ -471,6 +461,7 @@ describe('Render Functions', () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      expect(require('../js/utils.js').toggleBookmark).toHaveBeenCalledWith('testuser');
     });
   });
 

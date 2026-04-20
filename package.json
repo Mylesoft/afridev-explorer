@@ -61,7 +61,11 @@
       "^.+\\.js$": "babel-jest"
     },
     "testPathIgnorePatterns": [
-      "/node_modules/"
+      "/node_modules/",
+      "/\\.git-rewrite/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.git-rewrite"
     ]
   },
   "babel": {

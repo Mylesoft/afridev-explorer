@@ -81,6 +81,13 @@ async function loadDevelopers() {
       const dateQuery = buildDateFilter(currentTechDateFrom, currentTechDateTo);
       const country = techCountry?.value || '';
       
+      // Validate currentTech before making API call
+      if (!currentTech || currentTech.trim() === '') {
+        // Show a message instead of throwing an error
+        grid.innerHTML = '<div class="empty-state"><p>Please select a technology from the dropdown or click on a technology pill to search.</p></div>';
+        return;
+      }
+      
       if (currentTechType === 'framework') {
         result = await searchByFramework(currentTech, country, currentPage, 12);
       } else {
@@ -179,26 +186,26 @@ filterTabs.forEach(tab => {
 techSelect?.addEventListener('change', (e) => {
   currentTech = e.target.value;
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 });
 
 // Technology country filter
 techCountry?.addEventListener('change', () => {
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 });
 
 // Technology date filters
 techDateFrom?.addEventListener('change', (e) => {
   currentTechDateFrom = e.target.value;
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 });
 
 techDateTo?.addEventListener('change', (e) => {
   currentTechDateTo = e.target.value;
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 });
 
 // Country select for regular search
@@ -272,14 +279,14 @@ jobsDateTo?.addEventListener('change', (e) => {
 techSearchInput?.addEventListener('input', debounce((e) => {
   currentTechSearch = e.target.value;
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 }, 500));
 
 // Technology tab sort select
 techSortSelect?.addEventListener('change', () => {
   currentTechSort = techSortSelect.value;
   currentPage = 1;
-  if (currentTech) loadDevelopers();
+  if (currentTech && currentTech.trim() !== '') loadDevelopers();
 });
 
 // Cofounders search input

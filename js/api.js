@@ -242,7 +242,12 @@ export async function searchRepos(location = 'Africa', language = '', sort = 'st
  * @returns {Promise<Object>} - Developers and rate limit info
  */
 export async function searchDevelopersByTech(tech, location = '', page = 1, perPage = 12, dateQuery = '') {
-  let query = `language:${encodeURIComponent(tech)}`;
+  // Validate tech parameter
+  if (!tech || tech.trim() === '') {
+    throw new Error('Invalid search query. Please check your parameters.');
+  }
+  
+  let query = `language:${encodeURIComponent(tech.trim())}`;
   if (location) {
     query += ` location:${encodeURIComponent(location)}`;
   }
